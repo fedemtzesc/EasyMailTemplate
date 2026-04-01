@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title1}">Editor HTML Pro Claro</title>
+    <link rel="stylesheet" href="css/wysiwyg.css">
+</head>
+
+<body>
+
+    <div class="main">
+        <div class="left" id="leftPane">
+            <div class="config-section" id="configSection">
+                <div class="sticky-header">
+                    <h3 th:text="${title2}">x</h3>
+                    <div class="button-row">
+                        <button id="loadHTML">Cargar HTML</button>
+                        <button id="saveTemplate">Guardar plantilla</button>
+                        <button id="openDoc" onclick="openDocModal()">Documentación</button>
+                    </div>
+                </div>
+                <div class="config">
+                    <input type="file" id="fileHTMLInput" accept=".html" style="display:none;">
+
+                    <label>Nombre de plantilla (sin extension html):</label>
+                    <input type="text" id="templateName" placeholder="ej. promocion_navidad">
+
+                    <label id="jsonLabel">Descripción de su plantilla:</label>
+                    <textarea id="jsonRequestExample" rows="3" cols="5"
+                        placeholder="Escriba una breve descripción de la funcionalidad de plantilla"></textarea>
+
+                    <label>Frecuencia de Envío:</label>
+                    <select id="sendFrequency">
+                        <option value="I" selected>Envio Inmediato</option>
+                        <option value="S">Por fecha y hora de envío</option>
+                        <option value="D">Repetir todos los días a esta hora</option>
+                    </select>
+
+                    <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;">
+                    <input type="time" id="dailyTime" style="margin-bottom:8px; display:none;">
+
+                    <div id="dailyLimitContainer" class="hidden">
+                        <label class="limit-label">Límite de Repetición:</label>
+                        <select id="repeatLimitType" style="margin-bottom: 5px;">
+                            <option value="UNLIMITED" selected>Sin límite (Continuo)</option>
+                            <option value="QUANTITY">Por cantidad de veces</option>
+                            <option value="END_DATE">Por fecha de término</option>
+                        </select>
+
+                        <input type="number" id="repeatCount" placeholder="Número de repeticiones (ej. 10)"
+                            style="margin-bottom:8px; display:none;">
+                        <input type="date" id="endDate" style="margin-bottom:8px; display:none;">
+                    </div>
+
+                    <label id="lblRecipients">Destinatarios:</label>
+                    <input type="text" id="recipients" placeholder="emails (separados por coma)">
+
+                    <label>Subir imágenes de la plantilla (jpeg, gif, png, jpg, etc...):</label>
+                    <input type="file" id="imageUpload" multiple accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
+                    <div id="imageList"></div>
+                </div>
+
+            </div>
+
+            <div class="resize-handle" id="handle"></div>
+
+            <div class="editor-section" id="editorSection">
+                <textarea id="htmlInput" placeholder="Escribe o pega tu HTML aquí..."
+                    oninput="updatePreview()"></textarea>
+            </div>
+        </div>
+
+        <div class="right" id="rightPane">
+            <iframe id="previewFrame"></iframe>
+        </div>
+    </div>
+
+    <div id="docModal" style="display: none;">
+        <div id="modalContent">
+            <h4>📝 Documentación de Uso - Editor de Plantillas HTML Pro</h4>
+
+            <p>Bienvenido al Editor de Plantillas. Esta herramienta está diseñada para configurar el contenido HTML de
+                un correo electrónico y sus parámetros de envío, asegurando una correcta previsualización antes de su
+                despliegue.</p>
+
+            <hr>
+            <h5>1. Gestión del Contenido HTML (Editor Izquierdo Inferior)</h5>
+
+            <p>El área inferior del panel izquierdo es el corazón del editor. Aquí debe pegar o escribir su código HTML
+                de correo electrónico. Es vital que el código esté optimizado para la compatibilidad con múltiples
+                clientes de correo (tablas, CSS *inline*, etc.).</p>
+
+            <ul>
+                <li>**Cargar HTML:** Utilice este botón para importar un archivo `.html` existente desde su equipo. El
+                    contenido se cargará automáticamente en el área de texto.</li>
+                <li>**Previsualización Dinámica:** Cualquier cambio que realice en el `textarea` se reflejará
+                    inmediatamente en el `iframe` de previsualización a la derecha.</li>
+            </ul>
+
+            <hr>
+            <h5>2. Configuración de Datos (Panel Izquierdo Superior)</h5>
+
+            <p>Esta sección define cómo se llamará la plantilla y cómo se tratarán las variables dinámicas en el
+                contenido.</p>
+
+            <p><strong>Nombre de Plantilla:</strong></p>
+            <p>Es un campo crucial para identificar la plantilla en el sistema de envío. Debe ser único y descriptivo
+                (ej. `promocion_navidad_2024`). Se recomienda utilizar minúsculas y guiones bajos (`_`) para separación.
+            </p>
+
+            <p><strong>JSON Request Ejemplo:</strong></p>
+            <p>Defina aquí un objeto JSON que sirva como modelo de las variables que se inyectarán en su HTML. El
+                sistema buscará variables dentro del HTML con la sintaxis `{{clave}}` y las reemplazará con el `valor`
+                del JSON. </p>
+            <p>Ejemplo: Si en el HTML tiene `Hola {{nombre_cliente}}`, el JSON debe contener `{"nombre_cliente": "Juan
+                Pérez"}`.</p>
+
+            <hr>
+            <h5>3. Manejo de Imágenes para Previsualización</h5>
+
+            <p>Para asegurar que las imágenes se vean correctamente en el *preview* sin alterar el HTML de producción,
+                siga estos pasos:</p>
+
+            <ol>
+                <li>**Uso Estándar del SRC:** En su código HTML, las imágenes deben usar la ruta estándar del servidor,
+                    que es: **`src="img/nombre_de_archivo.extension"`**.</li>
+                <li>**Subir Imágenes:** Utilice el botón **"Subir imágenes"** y cargue los archivos de imagen
+                    correspondientes.</li>
+                <li>**Mapeo Automático:** El sistema tomará el nombre del archivo subido (ej. `logo.png`) y lo mapeará a
+                    la ruta `img/logo.png` dentro del *preview*, utilizando una URL temporal Base64 para visualizarlas
+                    localmente.</li>
+            </ol>
+            <p style="font-style: italic; color: #dc3545;">**ATENCIÓN:** Si el nombre del archivo subido no coincide
+                exactamente con el nombre de archivo en su `src`, la imagen NO se verá en la previsualización.</p>
+
+            <hr>
+            <h5>4. Configuración de Frecuencia y Límites</h5>
+
+            <p>El selector **Frecuencia de Envío** determina el comportamiento de la plantilla en el motor de envíos:
+            </p>
+
+            <ul>
+                <li>**Enviar Inmediatamente:** La plantilla se marca para un envío único tan pronto como sea posible.
+                </li>
+                <li>**Por fecha y hora de envío:** Permite especificar una fecha y hora (`datetime-local`) exacta para
+                    un envío programado y único en el futuro.</li>
+                <li>**Repetir todos los días a esta hora:** Define la hora (`time`) a la que se debe iniciar el proceso
+                    de envío diariamente. Esta opción requiere definir un límite.</li>
+            </ul>
+
+            <p><strong>Límite de Repetición (Solo para Envíos Diarios):</strong></p>
+            <p>Define cuándo debe detenerse el envío diario:</p>
+            <ul>
+                <li>**Sin límite (Continuo):** El envío continuará indefinidamente.</li>
+                <li>**Por cantidad de veces:** Detiene el envío después de que se haya ejecutado el número de veces
+                    especificado.</li>
+                <li>**Por fecha de término:** Detiene el envío automáticamente al alcanzar la fecha seleccionada.</li>
+            </ul>
+
+            <hr>
+            <h5>5. Guardar y Despliegue</h5>
+
+            <p>Una vez que todas las configuraciones estén completas, haga clic en **Guardar plantilla**. Esto compila
+                todos los datos (HTML original, nombre, JSON y frecuencia) y los envía al servidor para ser almacenados
+                y programados. El HTML que se guarda es el **original** (con `img/...`), no la versión con Base64.</p>
+
+
+            <button id="closeModalBtn" onclick="closeDocModal()">Cerrar</button>
+        </div>
+    </div>
+    <script src="js/wysiwyg.js"></script>
+</body>
+
+</html>

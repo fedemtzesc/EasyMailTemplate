@@ -1,0 +1,289 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #fff;
+  color: #000;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  height: calc(100vh);
+}
+
+.left {
+  width: 33.33%;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #ccc;
+}
+
+.right {
+  width: 66.66%;
+  border-left: 2px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+.config-section {
+  flex: 1;
+  padding: 9px;
+  overflow-y: auto;
+  /* Mantiene el scroll en este contenedor */
+  overflow-x: hidden;
+}
+
+.editor-section {
+  flex: 1;
+  padding: 10px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor Sticky para el Encabezado y Botones */
+.sticky-header {
+  position: sticky;
+  top: -10px;
+  z-index: 10;
+  background: #fff;
+  padding-top: 0px;
+  padding-bottom: 10px;
+  margin: 0 -10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.sticky-header h3 {
+  margin: 0;
+  padding: 5px 0;
+  /* opcional, por si quieres un poco de aire */
+}
+
+/* Ajuste de fuente para textarea */
+textarea {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+  outline: none;
+  font-family: Consolas, 'Courier New', 'Lucida Console', monospace;
+  font-size: 14px;
+  padding: 10px;
+  flex: 1;
+  resize: none;
+  box-sizing: border-box;
+}
+
+/* ************************************************* */
+/* *** CAMBIO SOLICITADO: JSON sin word-wrap y con scroll horizontal *** */
+#jsonRequestExample {
+  resize: vertical;
+  /* PROPIEDADES NUEVAS/MODIFICADAS: */
+  overflow-x: auto;
+  /* Habilita el scroll horizontal si es necesario */
+  word-wrap: normal;
+  /* Asegura que no haya saltos forzados de palabra */
+}
+
+/* ************************************************* */
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+  flex: 1;
+  cursor: pointer;
+}
+
+/* Estilos para inputs, select, y textarea (general) */
+.config input[type="text"],
+.config textarea,
+.config select,
+.config input[type="time"],
+.config input[type="datetime-local"],
+.config input[type="number"],
+.config input[type="date"] {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  outline: none;
+  box-sizing: border-box;
+  font-family: Consolas, 'Courier New', 'Lucida Console', monospace;
+  font-size: 14px;
+}
+
+/* Reducir el tamaño de fuente de las etiquetas */
+.config label {
+  font-size: 14px;
+  display: block;
+  color: #646464;
+  font-style: italic;
+}
+
+/* Margen superior para la etiqueta JSON Request Ejemplo */
+#jsonLabel {
+  margin-top: 5px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-row button {
+  width: 32%;
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+  color: #fff;
+  font-size: 14px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+/* === 1. COLORES DE BOTONES DIFERENTES === */
+#loadHTML {
+  background: #28a745;
+}
+
+#loadHTML:hover {
+  background: #1e7e34;
+}
+
+#saveTemplate {
+  background: #007bff;
+}
+
+#saveTemplate:hover {
+  background: #0056b3;
+}
+
+#openDoc {
+  background: #ffc107;
+  color: #212529;
+}
+
+#openDoc:hover {
+  background: #e0a800;
+}
+
+/* ======================================= */
+
+#imageList img {
+  width: 60px;
+  margin: 4px;
+  border-radius: 4px;
+}
+
+.resize-handle {
+  background: #ccc;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.fullscreen {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 9999;
+  border: none;
+  background: #fff;
+}
+
+/* Encabezado compacto y centrado */
+.config h3 {
+  margin: 5px 0;
+  padding: 0 0 10px 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Contenedor de límite */
+#dailyLimitContainer {
+  margin-top: -8px;
+}
+
+/* OCULTAR por defecto */
+.hidden {
+  display: none;
+}
+
+/* Aumentar el margen superior del label de Límite de Repetición */
+.limit-label {
+  display: block;
+  margin-top: 13px;
+}
+
+/* Fuente mejorada para visibilidad del guion bajo en todos los campos monoespaciados */
+#templateName,
+#jsonRequestExample,
+.config select,
+.config input[type="time"],
+.config input[type="datetime-local"],
+.config input[type="number"],
+.config input[type="date"] {
+  font-family: Consolas, 'Courier New', 'Lucida Console', monospace;
+}
+
+/* === ESTILOS DEL MODAL DE DOCUMENTACIÓN === */
+#docModal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+}
+
+#modalContent {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#modalContent h4 {
+  margin-top: 0;
+  color: #007bff;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+#closeModalBtn {
+  float: right;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #dc3545;
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+#closeModalBtn:hover {
+  background: #c82333;
+}
