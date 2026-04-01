@@ -1,0 +1,3 @@
+Este proyeto lo genere con este initalizer:
+
+https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.5.13&packaging=jar&configurationFileFormat=properties&jvmVersion=17&groupId=com.fdxsoft&artifactId=EasyMailTemplate&packageName=com.fdxsoft&dependencies=web,data-jpa,lombok,thymeleaf,mysql
