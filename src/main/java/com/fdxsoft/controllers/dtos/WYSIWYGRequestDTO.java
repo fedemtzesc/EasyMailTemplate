@@ -1,5 +1,7 @@
 package com.fdxsoft.controllers.dtos;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +22,6 @@ public class WYSIWYGRequestDTO {
     private Integer repeatQuantity;
     private String repeatEndDate;
     private String emailList;
+    private String htmlInput;
+    private MultipartFile[] images;
 }

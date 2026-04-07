@@ -1,0 +1,5 @@
+function isValidWYSIWYG(){
+	
+	
+	return true;
+}

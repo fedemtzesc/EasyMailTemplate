@@ -80,7 +80,7 @@ imageUpload.addEventListener("change", () => {
 
     // Almacenar el nombre del archivo para usarlo como clave
     const fileName = file.name;
-
+    console.log(file);
     reader.onload = e => {
       const imageUrl = e.target.result;
 

@@ -2,6 +2,7 @@ package com.fdxsoft.controllers.dtos;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class GenericResponseDTO<T> {
     private String message;
     private String status;
     private Integer httpStatus;
-    private T data;
+    private List<T> data;
 
     // Con este metodo regresamos la respuesta en un JSON Ordenado
     public Map<String, Object> getOrderedResponse() {
@@ -27,8 +28,8 @@ public class GenericResponseDTO<T> {
         response.put("timestamp", LocalDateTime.now());
         response.put("message", message);
         response.put("status", status);
-        response.put("data", data);
         response.put("httpStatus", httpStatus);
+        response.put("data", data);
         return response;
     }
 }

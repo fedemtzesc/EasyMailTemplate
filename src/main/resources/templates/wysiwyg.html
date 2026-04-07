@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title1}">Editor HTML Pro Claro</title>
-    <link rel="stylesheet" href="css/wysiwyg.css">
+    <title th:text="${title1}">EasyEmailTemplate - Diseñador de Plantillas</title>
+    <link rel="stylesheet" th:href="@{/css/wysiwyg-dark.css}">
 </head>
 
 <body>
@@ -17,7 +17,7 @@
                     <h3 th:text="${title2}">x</h3>
                     <div class="button-row">
                         <button id="loadHTML">Cargar HTML</button>
-                        <button id="saveTemplate">Guardar plantilla</button>
+                        <button id="saveTemplate" onclick="processWYSIWYG()">Guardar plantilla</button>
                         <button id="openDoc" onclick="openDocModal()">Documentación</button>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     <input type="text" id="templateName" placeholder="ej. promocion_navidad">
 
                     <label id="jsonLabel">Descripción de su plantilla:</label>
-                    <textarea id="jsonRequestExample" rows="3" cols="5"
+                    <textarea id="description" rows="3" cols="5"
                         placeholder="Escriba una breve descripción de la funcionalidad de plantilla"></textarea>
 
                     <label>Frecuencia de Envío:</label>
@@ -58,7 +58,7 @@
                     <input type="text" id="recipients" placeholder="emails (separados por coma)">
 
                     <label>Subir imágenes de la plantilla (jpeg, gif, png, jpg, etc...):</label>
-                    <input type="file" id="imageUpload" multiple accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
+                    <input type="file" id="imageUpload" title="Haga click aqui para seleccionar sus archivos..." multiple accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
                     <div id="imageList"></div>
                 </div>
 
@@ -171,6 +171,7 @@
         </div>
     </div>
     <script src="js/wysiwyg.js"></script>
+    <script type="text/javascript" th:src="@{/js/processor.js}"></script>
 </body>
 
 </html>
