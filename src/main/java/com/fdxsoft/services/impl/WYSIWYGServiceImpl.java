@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fdxsoft.controllers.dtos.GenericResponseDTO;
@@ -45,15 +46,10 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 
 	@Override
 	public GenericResponseDTO<WYSIWYGEntity> save(WYSIWYGRequestDTO wysiwygRequestDTO) {
-
 		GenericResponseDTO<WYSIWYGEntity> response = new GenericResponseDTO<>();
-
 		WYSIWYGEntity wysiwygEntity = mapToEntity(wysiwygRequestDTO);
-
-		// Validar duplicados solo cuando sea alta nueva
 		if (wysiwygEntity.getId() == null
 				&& wysiwygRepository.findByTemplateName(wysiwygEntity.getTemplateName()).isPresent()) {
-
 			response.setMessage("Ya existe una plantilla con este nombre");
 			response.setStatus("error");
 			response.setHttpStatus(HttpStatus.CONFLICT.value());
@@ -61,49 +57,32 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 		}
 
 		WYSIWYGEntity savedEntity = wysiwygRepository.save(wysiwygEntity);
-
 		try {
-
-			// Carpeta principal de la plantilla
 			Path templateFolder = Paths.get("src/main/resources/static/f_" + savedEntity.getId());
-
-			// Subcarpeta para imágenes
 			Path imageFolder = templateFolder.resolve("img");
-
 			Files.createDirectories(templateFolder);
+			if (Files.exists(imageFolder)) {
+				FileSystemUtils.deleteRecursively(imageFolder);
+			}
 			Files.createDirectories(imageFolder);
-
-			// Guardar el HTML
 			if (wysiwygRequestDTO.getHtmlInput() != null && !wysiwygRequestDTO.getHtmlInput().isBlank()) {
-
 				Path htmlFile = templateFolder.resolve("template.html");
-
 				Files.writeString(htmlFile, wysiwygRequestDTO.getHtmlInput(), StandardCharsets.UTF_8,
 						StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 			}
-
-			// Guardar imágenes
 			if (wysiwygRequestDTO.getImages() != null && wysiwygRequestDTO.getImages().length > 0) {
-
 				for (MultipartFile image : wysiwygRequestDTO.getImages()) {
-
 					if (image != null && !image.isEmpty()) {
-
 						String originalFileName = image.getOriginalFilename();
-
 						if (originalFileName == null || originalFileName.isBlank()) {
 							continue;
 						}
-
 						Path imagePath = imageFolder.resolve(originalFileName);
-
 						Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
 					}
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-
 			response.setMessage(
 					"La plantilla se guardó en BD, pero ocurrió un error al guardar el HTML o las imágenes");
 			response.setStatus("warning");
@@ -117,6 +96,73 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 		response.setHttpStatus(HttpStatus.OK.value());
 		response.setData(List.of(savedEntity));
 
+		return response;
+	}
+
+	@Override
+	public GenericResponseDTO<WYSIWYGEntity> update(WYSIWYGRequestDTO wysiwygRequestDTO) {
+		GenericResponseDTO<WYSIWYGEntity> response = new GenericResponseDTO<>();
+		WYSIWYGEntity wysiwygEntity = mapToEntity(wysiwygRequestDTO);
+		if (wysiwygEntity.getTemplateName() != null && !wysiwygEntity.getTemplateName().isBlank()) {
+			Optional<WYSIWYGEntity> wysiwygOptional = wysiwygRepository
+					.findByTemplateName(wysiwygEntity.getTemplateName());
+			if (wysiwygOptional.isPresent()) {
+				WYSIWYGEntity wysiwygFound = wysiwygOptional.get();
+				if (!wysiwygFound.getId().equals(wysiwygEntity.getId())) {
+					response.setMessage(
+							"El nombre nuevo de plantilla que quiere modificar ya le pertenece a otra plantilla.");
+					response.setStatus("error");
+					response.setHttpStatus(HttpStatus.CONFLICT.value());
+					return response;
+				}
+			}
+		}
+		if (wysiwygRepository.findById(wysiwygEntity.getId()).isPresent()) {
+			WYSIWYGEntity updatedEntity = wysiwygRepository.save(wysiwygEntity);
+			try {
+				Path templateFolder = Paths.get("src/main/resources/static/f_" + updatedEntity.getId());
+				Path imageFolder = templateFolder.resolve("img");
+				Files.createDirectories(templateFolder);
+				if (wysiwygRequestDTO.getHtmlInput() != null && !wysiwygRequestDTO.getHtmlInput().isBlank()) {
+					Path htmlFile = templateFolder.resolve("template.html");
+					Files.writeString(htmlFile, wysiwygRequestDTO.getHtmlInput(), StandardCharsets.UTF_8,
+							StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+				}
+
+				if (wysiwygRequestDTO.getImages() != null && wysiwygRequestDTO.getImages().length > 0) {
+					if (Files.exists(imageFolder)) {
+						FileSystemUtils.deleteRecursively(imageFolder);
+					}
+					Files.createDirectories(imageFolder);
+					for (MultipartFile image : wysiwygRequestDTO.getImages()) {
+						if (image != null && !image.isEmpty()) {
+							String originalFileName = image.getOriginalFilename();
+							if (originalFileName == null || originalFileName.isBlank()) {
+								continue;
+							}
+							Path imagePath = imageFolder.resolve(originalFileName);
+							Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+						}
+					}
+
+				}
+			} catch (Exception e) {
+				response.setMessage(
+						"La plantilla se guardó en BD, pero ocurrió un error al guardar el HTML o las imágenes");
+				response.setStatus("warning");
+				response.setHttpStatus(HttpStatus.PARTIAL_CONTENT.value());
+				response.setData(List.of(updatedEntity));
+				return response;
+			}
+			response.setMessage("Plantilla e imagenes actualizadas con exito.");
+			response.setStatus("success");
+			response.setHttpStatus(HttpStatus.OK.value());
+			response.setData(List.of(updatedEntity));
+		} else {
+			response.setMessage("La plantilla no se pudo actualizar por que no existe.");
+			response.setStatus("error");
+			response.setHttpStatus(HttpStatus.NOT_FOUND.value());
+		}
 		return response;
 	}
 
@@ -139,25 +185,6 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 			}
 		} else {
 			response.setMessage("No fue posible eliminar la plantilla por que no existe.");
-			response.setStatus("error");
-			response.setHttpStatus(HttpStatus.NOT_FOUND.value());
-		}
-		return response;
-	}
-
-	@Override
-	public GenericResponseDTO<WYSIWYGEntity> update(WYSIWYGRequestDTO wysiwygRequestDTO) {
-		GenericResponseDTO<WYSIWYGEntity> response = new GenericResponseDTO<>();
-		WYSIWYGEntity wysiwygEntity = mapToEntity(wysiwygRequestDTO);
-		if (wysiwygRepository.findById(wysiwygEntity.getId()).isPresent()) {
-			WYSIWYGEntity updatedEntity = wysiwygRepository.save(wysiwygEntity);
-			response.setMessage("Platilla actualizada con exito.");
-			response.setStatus("success");
-			response.setHttpStatus(HttpStatus.OK.value());
-			response.setData(List.of(updatedEntity));
-			return response;
-		} else {
-			response.setMessage("La plantilla no se pudo actualizar por que no existe.");
 			response.setStatus("error");
 			response.setHttpStatus(HttpStatus.NOT_FOUND.value());
 		}

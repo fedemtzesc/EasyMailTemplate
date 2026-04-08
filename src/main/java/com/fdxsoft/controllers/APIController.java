@@ -45,8 +45,9 @@ public class APIController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.valueOf((Integer)response.get("httpStatus")));
     }
     
-    @PatchMapping("/wysiwyg")
-    public ResponseEntity<Map<String, Object>> updateTemplate(@RequestBody WYSIWYGRequestDTO wysiwygRequestDTO) {
+    @PatchMapping(value="/wysiwyg", 
+		     consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> updateTemplate(@ModelAttribute WYSIWYGRequestDTO wysiwygRequestDTO) {
     	Map<String, Object> response = wysiwygServiceImpl.update(wysiwygRequestDTO).getOrderedResponse();
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.valueOf((Integer)response.get("httpStatus")));    
     }
