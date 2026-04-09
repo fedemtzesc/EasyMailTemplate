@@ -11,5 +11,13 @@ public class ViewsController {
         return "wysiwyg";
     }
     
-
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "welcome";
+    }
+    
+    @GetMapping("/templates-list")
+    public String templatesList() {
+        return "templates-list";
+    }
 }

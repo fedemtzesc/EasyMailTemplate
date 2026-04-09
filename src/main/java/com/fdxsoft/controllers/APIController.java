@@ -53,8 +53,13 @@ public class APIController {
     }
     
     @GetMapping("/wysiwyg/all")
-    public ResponseEntity<Map<String, Object>> getAllTemplates(){
-    	Map<String, Object> response = wysiwygServiceImpl.getAll().getOrderedResponse();
-        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.valueOf((Integer)response.get("httpStatus")));
+    public ResponseEntity<Map<String, Object>> getAllTemplates(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Map<String, Object> response = wysiwygServiceImpl.getAll(page, size).getOrderedResponse();
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.valueOf((Integer) response.get("httpStatus"))
+        );
     }
 }

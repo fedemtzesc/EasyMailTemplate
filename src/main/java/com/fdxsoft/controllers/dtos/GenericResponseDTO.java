@@ -21,6 +21,11 @@ public class GenericResponseDTO<T> {
     private String status;
     private Integer httpStatus;
     private List<T> data;
+    
+    // Campos para paginación
+    private Integer currentPage;
+    private Integer lastPage;
+    private Long totalRecords;
 
     // Con este metodo regresamos la respuesta en un JSON Ordenado
     public Map<String, Object> getOrderedResponse() {
@@ -29,6 +34,9 @@ public class GenericResponseDTO<T> {
         response.put("message", message);
         response.put("status", status);
         response.put("httpStatus", httpStatus);
+        response.put("currentPage", currentPage);
+        response.put("lastPage", lastPage);
+        response.put("totalRecords", totalRecords);
         response.put("data", data);
         return response;
     }

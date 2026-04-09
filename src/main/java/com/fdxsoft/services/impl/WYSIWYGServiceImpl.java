@@ -10,12 +10,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fdxsoft.controllers.dtos.GenericResponseDTO;
+import com.fdxsoft.controllers.dtos.WYSIWYGListDTO;
 import com.fdxsoft.controllers.dtos.WYSIWYGRequestDTO;
 import com.fdxsoft.entities.WYSIWYGEntity;
 import com.fdxsoft.repositories.WYSIWYGRepository;
@@ -192,21 +196,83 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 	}
 
 	@Override
-	public GenericResponseDTO<WYSIWYGEntity> getAll() {
-		GenericResponseDTO<WYSIWYGEntity> response = new GenericResponseDTO<>();
-		List<WYSIWYGEntity> wysiwygEntityList = wysiwygRepository.findAll();
-		if (!wysiwygEntityList.isEmpty()) {
-			response.setMessage("Plantilla Encontrada");
-			response.setStatus("success");
-			response.setHttpStatus(HttpStatus.OK.value());
-			response.setData(wysiwygEntityList);
-		} else {
-			response.setMessage("Plantilla no encontrada");
-			response.setStatus("error");
-			response.setHttpStatus(HttpStatus.NOT_FOUND.value());
-		}
-		return response;
+	public GenericResponseDTO<WYSIWYGListDTO> getAll(int page, int size) {
+
+	    GenericResponseDTO<WYSIWYGListDTO> response = new GenericResponseDTO<>();
+
+	    Pageable pageable = PageRequest.of(page - 1, size);
+	    Page<WYSIWYGEntity> entityPage = wysiwygRepository.findAll(pageable);
+
+	    if (!entityPage.isEmpty()) {
+
+	        List<WYSIWYGListDTO> dtoList = entityPage.getContent().stream().map(entity -> {
+
+	            WYSIWYGListDTO dto = new WYSIWYGListDTO();
+
+	            dto.setId(entity.getId());
+	            dto.setTemplateName(entity.getTemplateName());
+	            // Send Frequency
+	            switch (entity.getSendFrequency()) {
+	                case "I":
+	                    dto.setSendFrequencyDescription("Envío Inmediato");
+	                    dto.setRepeatLimitDescription("Envio inmediato al ser llamado via API REST.");
+	                    break;
+	                case "S":
+	                    dto.setSendFrequencyDescription("Envio en cierta fecha y a cierta hora");
+	                    dto.setRepeatLimitDescription("El envio sera realizado el dia " + entity.getDateTimeSending());
+	                    break;
+	                case "D":
+	                    dto.setSendFrequencyDescription("Repetir cierta cantidad de días a cierta hora.");
+	                    // Repeat Limit Type
+	    	            switch (entity.getRepeatLimitType()) {
+	    	                case "UNLIMITED":
+	    	                    dto.setRepeatLimitDescription("Sin límite de tiempo.");
+	    	                    break;
+
+	    	                case "QUANTITY":
+	    	                    dto.setRepeatLimitDescription(
+	    	                        entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt()
+	    	                    );
+	    	                    break;
+
+	    	                case "END_DATE":
+	    	                    dto.setRepeatLimitDescription(
+	    	                        "Todos los días hasta el día " + entity.getRepeatEndDate()
+	    	                    );
+	    	                    break;
+
+	    	                default:
+	    	                    dto.setRepeatLimitDescription(entity.getRepeatLimitType());
+	    	            }	
+	                    break;
+	                default:
+	                    dto.setSendFrequencyDescription(entity.getSendFrequency());
+	            }
+
+	                        
+
+	            return dto;
+
+	        }).toList();
+
+	        response.setMessage("Plantillas Encontradas");
+	        response.setStatus("success");
+	        response.setHttpStatus(HttpStatus.OK.value());
+	        response.setData(dtoList);
+
+	        response.setCurrentPage(entityPage.getNumber() + 1);
+	        response.setLastPage(entityPage.getTotalPages());
+	        response.setTotalRecords(entityPage.getTotalElements());
+
+	    } else {
+	        response.setMessage("Plantillas no encontradas");
+	        response.setStatus("error");
+	        response.setHttpStatus(HttpStatus.NOT_FOUND.value());
+	    }
+
+	    return response;
 	}
+
 
 	@Override
 	public WYSIWYGEntity mapToEntity(WYSIWYGRequestDTO wysiwygRequestDTO) {

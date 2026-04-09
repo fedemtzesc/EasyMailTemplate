@@ -25,6 +25,7 @@ public class WYSIWYGEntity {
 
     private String templateName;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(length = 1)
