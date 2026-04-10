@@ -23,6 +23,7 @@ public class GenericResponseDTO<T> {
     private List<T> data;
     
     // Campos para paginación
+    private boolean paging;
     private Integer currentPage;
     private Integer lastPage;
     private Long totalRecords;
@@ -34,9 +35,11 @@ public class GenericResponseDTO<T> {
         response.put("message", message);
         response.put("status", status);
         response.put("httpStatus", httpStatus);
-        response.put("currentPage", currentPage);
-        response.put("lastPage", lastPage);
-        response.put("totalRecords", totalRecords);
+        if(paging) {
+        	response.put("lastPage", lastPage);
+            response.put("totalRecords", totalRecords);
+            response.put("currentPage", currentPage);
+        }
         response.put("data", data);
         return response;
     }

@@ -1,5 +1,7 @@
 package com.fdxsoft.entities;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,5 +44,12 @@ public class WYSIWYGEntity {
     private String repeatEndDate;
 
     private String emailList;
+    
+    @Column(name = "creation_date",
+    	    nullable = false,
+    	    updatable = false,
+    	    insertable = false,
+    	    columnDefinition = "TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)")
+    private LocalDateTime creationDate;
 
 }

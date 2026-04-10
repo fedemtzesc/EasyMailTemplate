@@ -172,6 +172,12 @@
     </div>
     <script src="js/wysiwyg.js"></script>
     <script type="text/javascript" th:src="@{/js/processor.js}"></script>
+    
+	<script th:inline="javascript">
+	    const viewDTO = /*[[${viewDTO}]]*/ null;
+	    const editMode = /*[[${editMode}]]*/ false;
+	    const errorMessage = /*[[${errorMessage}]]*/ null;
+	</script>
 </body>
 
 </html>

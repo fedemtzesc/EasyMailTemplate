@@ -39,6 +39,12 @@ public class APIController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.valueOf((Integer)response.get("httpStatus")));
     }
     
+    @GetMapping("/wysiwyg/{id}")
+    public ResponseEntity<Map<String, Object>> findById(@PathVariable Long id){
+    	Map<String, Object> response = wysiwygServiceImpl.findById(id).getOrderedResponse();
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.valueOf((Integer)response.get("httpStatus")));
+    }
+    
     @DeleteMapping("/wysiwyg/{id}")
     public ResponseEntity<Map<String, Object>> deleteTemplateById(@PathVariable Long id){
     	Map<String, Object> response = wysiwygServiceImpl.delete(id).getOrderedResponse();
@@ -55,8 +61,9 @@ public class APIController {
     @GetMapping("/wysiwyg/all")
     public ResponseEntity<Map<String, Object>> getAllTemplates(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Map<String, Object> response = wysiwygServiceImpl.getAll(page, size).getOrderedResponse();
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search) {
+        Map<String, Object> response = wysiwygServiceImpl.getAll(page, size, search).getOrderedResponse();
         return new ResponseEntity<>(
                 response,
                 HttpStatus.valueOf((Integer) response.get("httpStatus"))

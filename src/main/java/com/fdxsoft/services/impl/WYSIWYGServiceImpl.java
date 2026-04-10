@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,15 +22,78 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fdxsoft.controllers.dtos.GenericResponseDTO;
 import com.fdxsoft.controllers.dtos.WYSIWYGListDTO;
 import com.fdxsoft.controllers.dtos.WYSIWYGRequestDTO;
+import com.fdxsoft.controllers.dtos.WYSIWYGViewDTO;
 import com.fdxsoft.entities.WYSIWYGEntity;
 import com.fdxsoft.repositories.WYSIWYGRepository;
 import com.fdxsoft.services.WYSIWYGService;
+import com.fdxsoft.utils.DateTimeUtils;
 
 @Service
 public class WYSIWYGServiceImpl implements WYSIWYGService {
 
 	@Autowired
 	private WYSIWYGRepository wysiwygRepository;
+
+	@Override
+	public GenericResponseDTO<WYSIWYGViewDTO> findById(Long id) {
+		GenericResponseDTO<WYSIWYGViewDTO> response = new GenericResponseDTO<>();
+		Optional<WYSIWYGEntity> wysiwygEntity = wysiwygRepository.findById(id);
+
+		if (wysiwygEntity.isEmpty()) {
+			response.setMessage("Plantilla no encontrada");
+			response.setStatus("error");
+			response.setHttpStatus(HttpStatus.NOT_FOUND.value());
+			response.setData(Collections.emptyList());
+			return response;
+		}
+
+		try {
+			WYSIWYGEntity entity = wysiwygEntity.get();
+			WYSIWYGViewDTO viewDTO = new WYSIWYGViewDTO();
+			// =========================
+			// MAPEO BD → DTO
+			// =========================
+			viewDTO.setId(entity.getId());
+			viewDTO.setTemplateName(entity.getTemplateName());
+			viewDTO.setDescription(entity.getDescription());
+			viewDTO.setSendFrequency(entity.getSendFrequency());
+			viewDTO.setDateTimeSending(entity.getDateTimeSending());
+			viewDTO.setRepeatEachTimeAt(entity.getRepeatEachTimeAt());
+			viewDTO.setRepeatLimitType(entity.getRepeatLimitType());
+			viewDTO.setRepeatQuantity(entity.getRepeatQuantity());
+			viewDTO.setRepeatEndDate(entity.getRepeatEndDate());
+			viewDTO.setEmailList(entity.getEmailList());
+
+			// =========================
+			// HTML DESDE FILESYSTEM
+			// =========================
+			String basePath = "src/main/resources/static/emails";
+			Path htmlPath = Paths.get(basePath, "f_" + entity.getId(), "template.html");
+
+			if (Files.exists(htmlPath)) {
+				String html = Files.readString(htmlPath, StandardCharsets.UTF_8);
+				viewDTO.setHtmlInput(html);
+			} else {
+				viewDTO.setHtmlInput("");
+			}
+
+			// =========================
+			// RESPONSE
+			// =========================
+			response.setMessage("Plantilla Encontrada");
+			response.setStatus("success");
+			response.setHttpStatus(HttpStatus.OK.value());
+			response.setData(List.of(viewDTO));
+
+			return response;
+		} catch (Exception e) {
+			response.setMessage("Error al cargar la plantilla. " + e.getMessage());
+			response.setStatus("error");
+			response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			response.setData(Collections.emptyList());
+			return response;
+		}
+	}
 
 	@Override
 	public GenericResponseDTO<WYSIWYGEntity> findByEntityName(String templateName) {
@@ -62,7 +126,7 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 
 		WYSIWYGEntity savedEntity = wysiwygRepository.save(wysiwygEntity);
 		try {
-			Path templateFolder = Paths.get("src/main/resources/static/f_" + savedEntity.getId());
+			Path templateFolder = Paths.get("src/main/resources/static/emails/f_" + savedEntity.getId());
 			Path imageFolder = templateFolder.resolve("img");
 			Files.createDirectories(templateFolder);
 			if (Files.exists(imageFolder)) {
@@ -124,7 +188,7 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 		if (wysiwygRepository.findById(wysiwygEntity.getId()).isPresent()) {
 			WYSIWYGEntity updatedEntity = wysiwygRepository.save(wysiwygEntity);
 			try {
-				Path templateFolder = Paths.get("src/main/resources/static/f_" + updatedEntity.getId());
+				Path templateFolder = Paths.get("src/main/resources/static/emails/f_" + updatedEntity.getId());
 				Path imageFolder = templateFolder.resolve("img");
 				Files.createDirectories(templateFolder);
 				if (wysiwygRequestDTO.getHtmlInput() != null && !wysiwygRequestDTO.getHtmlInput().isBlank()) {
@@ -196,83 +260,87 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 	}
 
 	@Override
-	public GenericResponseDTO<WYSIWYGListDTO> getAll(int page, int size) {
+	public GenericResponseDTO<WYSIWYGListDTO> getAll(int page, int size, String search) {
 
-	    GenericResponseDTO<WYSIWYGListDTO> response = new GenericResponseDTO<>();
+		GenericResponseDTO<WYSIWYGListDTO> response = new GenericResponseDTO<>();
+		response.setPaging(true);
 
-	    Pageable pageable = PageRequest.of(page - 1, size);
-	    Page<WYSIWYGEntity> entityPage = wysiwygRepository.findAll(pageable);
+		Pageable pageable = PageRequest.of(page - 1, size);
 
-	    if (!entityPage.isEmpty()) {
+		Page<WYSIWYGEntity> entityPage;
 
-	        List<WYSIWYGListDTO> dtoList = entityPage.getContent().stream().map(entity -> {
+		if (search != null && !search.trim().isEmpty()) {
+			entityPage = wysiwygRepository.findByTemplateNameContainingIgnoreCase(search, pageable);
+		} else {
+			entityPage = wysiwygRepository.findAll(pageable);
+		}
 
-	            WYSIWYGListDTO dto = new WYSIWYGListDTO();
+		List<WYSIWYGListDTO> dtoList = entityPage.getContent().stream().map(entity -> {
 
-	            dto.setId(entity.getId());
-	            dto.setTemplateName(entity.getTemplateName());
-	            // Send Frequency
-	            switch (entity.getSendFrequency()) {
-	                case "I":
-	                    dto.setSendFrequencyDescription("Envío Inmediato");
-	                    dto.setRepeatLimitDescription("Envio inmediato al ser llamado via API REST.");
-	                    break;
-	                case "S":
-	                    dto.setSendFrequencyDescription("Envio en cierta fecha y a cierta hora");
-	                    dto.setRepeatLimitDescription("El envio sera realizado el dia " + entity.getDateTimeSending());
-	                    break;
-	                case "D":
-	                    dto.setSendFrequencyDescription("Repetir cierta cantidad de días a cierta hora.");
-	                    // Repeat Limit Type
-	    	            switch (entity.getRepeatLimitType()) {
-	    	                case "UNLIMITED":
-	    	                    dto.setRepeatLimitDescription("Sin límite de tiempo.");
-	    	                    break;
+			WYSIWYGListDTO dto = new WYSIWYGListDTO();
 
-	    	                case "QUANTITY":
-	    	                    dto.setRepeatLimitDescription(
-	    	                        entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt()
-	    	                    );
-	    	                    break;
+			dto.setId(entity.getId());
+			dto.setTemplateName(entity.getTemplateName());
 
-	    	                case "END_DATE":
-	    	                    dto.setRepeatLimitDescription(
-	    	                        "Todos los días hasta el día " + entity.getRepeatEndDate()
-	    	                    );
-	    	                    break;
+			switch (entity.getSendFrequency()) {
+			case "I":
+				dto.setSendFrequencyDescription("Envío Inmediato");
+				dto.setRepeatLimitDescription("Envio inmediato al ser llamado via API REST.");
+				break;
 
-	    	                default:
-	    	                    dto.setRepeatLimitDescription(entity.getRepeatLimitType());
-	    	            }	
-	                    break;
-	                default:
-	                    dto.setSendFrequencyDescription(entity.getSendFrequency());
-	            }
+			case "S":
+				dto.setSendFrequencyDescription("Envio en cierta fecha y a cierta hora");
+				dto.setRepeatLimitDescription("El envio sera realizado el dia "
+						+ DateTimeUtils.DescriptiveFormat(entity.getDateTimeSending()));
+				break;
 
-	                        
+			case "D":
+				dto.setSendFrequencyDescription("Repetir cierta cantidad de días a cierta hora.");
 
-	            return dto;
+				switch (entity.getRepeatLimitType()) {
+				case "UNLIMITED":
+					dto.setRepeatLimitDescription("Sin límite de tiempo.");
+					break;
 
-	        }).toList();
+				case "QUANTITY":
+					dto.setRepeatLimitDescription(
+							entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt());
+					break;
 
-	        response.setMessage("Plantillas Encontradas");
-	        response.setStatus("success");
-	        response.setHttpStatus(HttpStatus.OK.value());
-	        response.setData(dtoList);
+				case "END_DATE":
+					dto.setRepeatLimitDescription("Todos los días hasta el día " + entity.getRepeatEndDate());
+					break;
 
-	        response.setCurrentPage(entityPage.getNumber() + 1);
-	        response.setLastPage(entityPage.getTotalPages());
-	        response.setTotalRecords(entityPage.getTotalElements());
+				default:
+					dto.setRepeatLimitDescription(entity.getRepeatLimitType());
+				}
+				break;
 
-	    } else {
-	        response.setMessage("Plantillas no encontradas");
-	        response.setStatus("error");
-	        response.setHttpStatus(HttpStatus.NOT_FOUND.value());
-	    }
+			default:
+				dto.setSendFrequencyDescription(entity.getSendFrequency());
+			}
 
-	    return response;
+			return dto;
+
+		}).toList();
+
+		response.setData(dtoList);
+		response.setCurrentPage(entityPage.getNumber() + 1);
+		response.setLastPage(entityPage.getTotalPages() > 0 ? entityPage.getTotalPages() : 1);
+		response.setTotalRecords(entityPage.getTotalElements());
+
+		if (dtoList.isEmpty()) {
+			response.setMessage("No se encontraron plantillas registradas");
+			response.setStatus("success");
+			response.setHttpStatus(HttpStatus.OK.value());
+		} else {
+			response.setMessage("Plantillas encontradas");
+			response.setStatus("success");
+			response.setHttpStatus(HttpStatus.OK.value());
+		}
+
+		return response;
 	}
-
 
 	@Override
 	public WYSIWYGEntity mapToEntity(WYSIWYGRequestDTO wysiwygRequestDTO) {
@@ -331,4 +399,5 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 
 		return wysiwygEntity;
 	}
+
 }
