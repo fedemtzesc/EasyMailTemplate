@@ -1,189 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Resumen de Compra</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promoción Día de Muertos</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f4f7; font-family:Arial, Helvetica, sans-serif;">
 
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7; padding:40px 0;">
-    <tr>
-      <td align="center">
+<body style="margin:0; padding:0; background-color:#1a1a1a; font-family:Arial, Helvetica, sans-serif;">
 
-        <table width="650" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:18px; overflow:hidden; box-shadow:0 8px 25px rgba(0,0,0,0.12);">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:20px 0;">
+<tr>
+<td align="center">
 
-          <!-- Header -->
-          <tr>
-            <td style="background:linear-gradient(135deg, #4f46e5, #7c3aed); padding:35px 40px; text-align:center;">
-              <h1 style="margin:0; color:#ffffff; font-size:30px; font-weight:bold;">
-                📚 ¡Gracias por tu compra!
-              </h1>
-              <p style="margin:12px 0 0 0; color:#e0e7ff; font-size:16px;">
-                Tu pedido ha sido procesado correctamente
-              </p>
-            </td>
-          </tr>
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden;">
 
-          <!-- Saludo -->
-          <tr>
-            <td style="padding:35px 40px 10px 40px;">
-              <p style="margin:0; font-size:18px; color:#333333;">
-                Hola <strong>{{customerName}}</strong>,
-              </p>
+<!-- HEADER -->
+<tr>
+<td align="center" style="background-color:#000000; color:#ffffff; padding:25px;">
+<h1 style="margin:0; font-size:28px;">💀 Promoción Día de Muertos 🌼</h1>
+<p style="margin:10px 0 0; font-size:16px;">Tradición, sabor y grandes descuentos</p>
+</td>
+</tr>
 
-              <p style="margin:20px 0 0 0; font-size:15px; line-height:1.7; color:#555555;">
-                Gracias por comprar con nosotros. Aquí tienes el resumen de tu pedido:
-              </p>
-            </td>
-          </tr>
+<!-- CONTENIDO -->
+<tr>
+<td style="padding:30px; text-align:center;">
 
-          <!-- Datos generales -->
-          <tr>
-            <td style="padding:20px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:20px;">
-                <tr>
-                  <td style="padding:10px 0; color:#6b7280; font-size:14px;">
-                    Número de pedido
-                  </td>
-                  <td align="right" style="padding:10px 0; color:#111827; font-size:14px; font-weight:bold;">
-                    {{orderNumber}}
-                  </td>
-                </tr>
+<table width="100%" cellpadding="15" cellspacing="0" border="0" style="background-color:#fff3cd; border-radius:8px;">
+<tr>
+<td>
 
-                <tr>
-                  <td style="padding:10px 0; color:#6b7280; font-size:14px;">
-                    Fecha de compra
-                  </td>
-                  <td align="right" style="padding:10px 0; color:#111827; font-size:14px; font-weight:bold;">
-                    {{purchaseDate}}
-                  </td>
-                </tr>
+<span style="font-size:20px; font-weight:bold; color:#6c2bd9;">🍞 Pan de Muerto</span><br><br>
+<span style="font-size:26px; color:#d97706; font-weight:bold;">40% de descuento</span>
+</td>
+</tr>
+</table>
 
-                <tr>
-                  <td style="padding:10px 0; color:#6b7280; font-size:14px;">
-                    Método de pago
-                  </td>
-                  <td align="right" style="padding:10px 0; color:#111827; font-size:14px; font-weight:bold;">
-                    {{paymentMethod}}
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+</td>
+</tr>
 
-          <!-- Libros -->
-          <tr>
-            <td style="padding:0 40px 20px 40px;">
-              <h2 style="margin:0 0 18px 0; color:#111827; font-size:20px;">
-                Detalle de libros comprados
-              </h2>
+<!-- BOTÓN -->
+<tr>
+<td align="center" style="padding:20px;">
+<a href="#" onclick="accion()" style="background-color:#6c2bd9; color:#ffffff; text-decoration:none; padding:12px 25px; border-radius:5px; font-size:16px; display:inline-block;">
+Comprar ahora
+</a>
+</td>
+</tr>
 
-              <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+<!-- FOOTER -->
+<tr>
+<td align="center" style="background-color:#000000; color:#ffffff; padding:15px; font-size:14px;">
+🌼 Celebra nuestras tradiciones con sabor y alegría 🌼
+</td>
+</tr>
 
-                <tr style="background-color:#111827;">
-                  <th align="left" style="padding:14px; color:#ffffff; font-size:14px;">
-                    Libro
-                  </th>
-                  <th align="center" style="padding:14px; color:#ffffff; font-size:14px;">
-                    Cantidad
-                  </th>
-                  <th align="right" style="padding:14px; color:#ffffff; font-size:14px;">
-                    Precio
-                  </th>
-                </tr>
+</table>
 
-                <tr style="background-color:#f9fafb;">
-                  <td style="padding:14px; border-bottom:1px solid #e5e7eb; color:#374151;">
-                    {{bookTitle1}}
-                  </td>
-                  <td align="center" style="padding:14px; border-bottom:1px solid #e5e7eb; color:#374151;">
-                    {{quantity1}}
-                  </td>
-                  <td align="right" style="padding:14px; border-bottom:1px solid #e5e7eb; color:#374151;">
-                    ${{price1}}
-                  </td>
-                </tr>
-
-                <tr style="background-color:#ffffff;">
-                  <td style="padding:14px; border-bottom:1px solid #e5e7eb; color:#374151;">
-                    {{bookTitle2}}
-                  </td>
-                  <td align="center" style="padding:14px; border-bottom:1px solid #e5e7eb; color:#374151;">
-                    {{quantity2}}
-                  </td>
-                  <td align="right" style="padding:14px; border-bottom:1px solid #e5e7eb; color:#374151;">
-                    ${{price2}}
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-
-          <!-- Totales -->
-          <tr>
-            <td style="padding:0 40px 30px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc; border-radius:12px; border:1px solid #e5e7eb;">
-                <tr>
-                  <td style="padding:16px; color:#6b7280;">
-                    Subtotal
-                  </td>
-                  <td align="right" style="padding:16px; color:#111827; font-weight:bold;">
-                    ${{subtotal}}
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:16px; color:#6b7280;">
-                    Envío
-                  </td>
-                  <td align="right" style="padding:16px; color:#111827; font-weight:bold;">
-                    ${{shipping}}
-                  </td>
-                </tr>
-
-                <tr style="background-color:#eef2ff;">
-                  <td style="padding:18px; color:#312e81; font-size:18px; font-weight:bold;">
-                    Total Pagado
-                  </td>
-                  <td align="right" style="padding:18px; color:#312e81; font-size:22px; font-weight:bold;">
-                    ${{total}}
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding:10px 40px 40px 40px;">
-              <a href="{{trackingUrl}}" style="display:inline-block; background:linear-gradient(135deg, #4f46e5, #7c3aed); color:#ffffff; text-decoration:none; padding:14px 28px; border-radius:10px; font-size:15px; font-weight:bold;">
-                Ver estado de mi pedido
-              </a>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color:#111827; padding:25px 40px; text-align:center;">
-              <p style="margin:0; color:#9ca3af; font-size:13px;">
-                Si tienes dudas sobre tu pedido, contáctanos en
-                <a href="mailto:soporte@tulibreria.com" style="color:#ffffff; text-decoration:none;">
-                  soporte@tulibreria.com
-                </a>
-              </p>
-
-              <p style="margin:10px 0 0 0; color:#6b7280; font-size:12px;">
-                © 2026 Tu Librería Online. Todos los derechos reservados.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
+</td>
+</tr>
+</table>
 
 </body>
+<script>
+	function accion(){
+		alert('Estas yendo a la pagina de la promocion');
+		window.location.href='https://vips.com.mx/entrada/de-golosos-y-tragones-vips-y-el-pan-de-muerto';
+	}
+</script>
+
 </html>

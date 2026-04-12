@@ -1,14 +1,20 @@
 package com.fdxsoft.services.impl;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -78,9 +84,83 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 			}
 
 			// =========================
+			// IMÁGENES DESDE FILESYSTEM
+			// =========================
+			Path imgDir = Paths.get(basePath, "f_" + entity.getId(), "img");
+
+			Map<String, String> imagesMap = new HashMap<>();
+			List<String> erroresImagenes = new ArrayList<>();
+
+			if (Files.exists(imgDir) && Files.isDirectory(imgDir)) {
+				try (Stream<Path> paths = Files.list(imgDir)) {
+
+					paths
+					  .filter(Files::isRegularFile)
+					  .forEach(path -> {
+					      try {
+					          String fileName = path.getFileName().toString();
+					          String lowerName = fileName.toLowerCase();
+
+					          if (!(lowerName.endsWith(".png") || lowerName.endsWith(".jpg") ||
+					                lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif") ||
+					                lowerName.endsWith(".webp") || lowerName.endsWith(".svg"))) {
+					              return;
+					          }
+
+					          if (Files.size(path) > 2_000_000) {
+					              erroresImagenes.add("Archivo demasiado grande: " + fileName);
+					              return;
+					          }
+
+					          byte[] bytes = Files.readAllBytes(path);
+					          String base64 = Base64.getEncoder().encodeToString(bytes);
+
+					          String mimeType = Files.probeContentType(path);
+
+					          if (mimeType == null) {
+					              if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+					                  mimeType = "image/jpeg";
+					              } else if (lowerName.endsWith(".png")) {
+					                  mimeType = "image/png";
+					              } else if (lowerName.endsWith(".gif")) {
+					                  mimeType = "image/gif";
+					              } else if (lowerName.endsWith(".webp")) {
+					                  mimeType = "image/webp";
+					              } else if (lowerName.endsWith(".svg")) {
+					                  mimeType = "image/svg+xml";
+					              } else {
+					                  mimeType = "application/octet-stream";
+					              }
+					          }
+
+					          String base64Url = "data:" + mimeType + ";base64," + base64;
+
+					          imagesMap.put(fileName, base64Url);
+
+					      } catch (IOException e) {
+					          erroresImagenes.add("Error con archivo: " + path.getFileName() + ": " + e.getMessage());
+					      }
+					  });
+
+				} catch (IOException e) {
+					response.setMessage("Error al listar imágenes. " + e.getMessage());
+					response.setStatus("error");
+					response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+					response.setData(Collections.emptyList());
+					return response;
+				}
+			}
+
+			if (!erroresImagenes.isEmpty()) {
+				response.setMessage("Plantilla cargada con advertencias: " + erroresImagenes);
+			} else {
+				response.setMessage("Plantilla Cargada Exitosamente");
+			}
+
+			// =========================
 			// RESPONSE
 			// =========================
-			response.setMessage("Plantilla Encontrada");
+			viewDTO.setImages(imagesMap);
 			response.setStatus("success");
 			response.setHttpStatus(HttpStatus.OK.value());
 			response.setData(List.of(viewDTO));

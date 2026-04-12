@@ -4,7 +4,7 @@ let previewFrame = document.getElementById('previewFrame');
 let handle = document.getElementById('handle');
 let leftPane = document.getElementById('leftPane');
 let rightPane = document.getElementById('rightPane');
-let configSection = document.getElementById('configSection'); // Contenedor de scroll
+let configSection = document.getElementById('configSection');
 let editorSection = document.getElementById('editorSection');
 let isResizing = false;
 
@@ -22,172 +22,190 @@ const endDate = document.getElementById('endDate');
 // Variables del Modal
 const docModal = document.getElementById('docModal');
 
-// Objeto para almacenar las imágenes subidas (Nombre de archivo: Base64 URL)
+// Objeto para almacenar las imágenes subidas
 const uploadedImages = {};
 
-// === LÓGICA DEL MODAL ===
+// =========================
+// MODAL
+// =========================
 function openDocModal() {
-  docModal.style.display = 'flex'; // Usar flex para centrar el contenido
+  docModal.style.display = 'flex';
 }
 
 function closeDocModal() {
   docModal.style.display = 'none';
 }
 
-// Cerrar el modal al hacer clic en el overlay (fuera del contenido)
 docModal.addEventListener('click', (event) => {
   if (event.target === docModal) {
     closeDocModal();
   }
 });
+
 // =========================
-
-
-// Redimension vertical
+// RESIZE
+// =========================
 handle.addEventListener('mousedown', e => {
   isResizing = true;
   document.body.style.cursor = 'ns-resize';
 });
+
 document.addEventListener('mousemove', e => {
   if (!isResizing) return;
+
   let containerTop = configSection.getBoundingClientRect().top;
   let newHeight = e.clientY - containerTop;
+
   if (newHeight < 50) newHeight = 50;
   if (newHeight > leftPane.clientHeight - 50) newHeight = leftPane.clientHeight - 50;
+
   configSection.style.flex = '0 0 ' + newHeight + 'px';
   editorSection.style.flex = '1';
 });
+
 document.addEventListener('mouseup', e => {
   isResizing = false;
   document.body.style.cursor = 'default';
 });
 
-// Subida de imágenes
+// =========================
+// SUBIDA DE IMÁGENES
+// =========================
 const imageUpload = document.getElementById('imageUpload');
 const imageList = document.getElementById('imageList');
 
 imageUpload.addEventListener("change", () => {
   imageList.innerHTML = "";
-  // Limpiar el objeto de imágenes cargadas antes de volver a llenarlo
+
+  // limpiar estado anterior
   for (const key in uploadedImages) {
     if (uploadedImages.hasOwnProperty(key)) {
       delete uploadedImages[key];
     }
   }
 
-  [...imageUpload.files].forEach(file => {
-    const reader = new FileReader();
+  const files = [...imageUpload.files];
 
-    // Almacenar el nombre del archivo para usarlo como clave
+  const MAX_SIZE = 500 * 1024; // 500KB
+
+  // 🔥 VALIDACIÓN GLOBAL (si UNA falla, se cancela TODO)
+  const invalidFile = files.find(file => file.size > MAX_SIZE);
+
+  if (invalidFile) {
+    alert(`La imagen "${invalidFile.name}" excede el límite de 500KB. No se cargará ninguna imagen.`);
+
+    // limpiar input para evitar estado inconsistente
+    imageUpload.value = "";
+
+    return; // 🚫 ABORTA TODO EL PROCESO
+  }
+
+  // =========================
+  // SOLO SI TODO ES VÁLIDO
+  // =========================
+  files.forEach(file => {
+    const reader = new FileReader();
     const fileName = file.name;
-    console.log(file);
+
     reader.onload = e => {
       const imageUrl = e.target.result;
 
-      // 1. ALMACENAR la URL Base64 para usarla en el preview
+      // guardar en estado
       uploadedImages[fileName] = imageUrl;
 
-      // 2. Mostrar la miniatura
+      // crear miniatura
       const img = document.createElement("img");
       img.src = imageUrl;
-      img.title = fileName; // Mostrar el nombre del archivo al pasar el ratón
+      img.title = fileName;
+
       imageList.appendChild(img);
 
-      // 3. Actualizar el preview para que la imagen se vea inmediatamente
+      // actualizar preview
       updatePreview();
 
-      // 4. Mueve el scroll hasta abajo para mostrar la imagen
+      // scroll al final
       configSection.scrollTop = configSection.scrollHeight;
     };
+
     reader.readAsDataURL(file);
   });
 });
 
 
-// LÓGICA DE VISIBILIDAD DE FRECUENCIA PRINCIPAL (dailyTime, scheduleDateTime)
+// =========================
+// FRECUENCIA (FIX: SIN showPicker)
+// =========================
 sendFrequency.addEventListener('change', () => {
-  // Ocultar todos los campos condicionales por defecto
+
   dailyTime.style.display = 'none';
   scheduleDateTime.style.display = 'none';
   dailyLimitContainer.classList.add('hidden');
 
-  // Ocultar los campos de límite interior
   repeatCount.style.display = 'none';
   recipients.style.display = 'none';
   lblRecipients.style.display = 'none';
   endDate.style.display = 'none';
 
-
   if (sendFrequency.value === 'D') {
-    // 1. Mostrar el control de tiempo diario y el contenedor de límite
+
     dailyTime.style.display = 'inline-block';
     recipients.style.display = 'inline-block';
     lblRecipients.style.display = 'inline-block';
     dailyLimitContainer.classList.remove('hidden');
 
-    // 2. Dar foco y abrir el selector del tiempo diario
-    dailyTime.focus();
-    if (dailyTime.showPicker) {
-      dailyTime.showPicker();
-    }
+    // ❌ REMOVIDO: dailyTime.showPicker()
 
-    // Cambiar el foco al select de límite de repetición
     setTimeout(() => {
       repeatLimitType.focus();
-      handleRepeatLimitChange(); // Asegurar que el campo de límite inicial se muestre
+      handleRepeatLimitChange();
     }, 100);
 
-
   } else if (sendFrequency.value === 'S') {
-    // 1. Mostrar el control de datetime-local
+
     scheduleDateTime.style.display = 'inline-block';
     recipients.style.display = 'inline-block';
     lblRecipients.style.display = 'inline-block';
 
-    // 2. Dar foco y abrir el selector
     scheduleDateTime.focus();
 
-    if (scheduleDateTime.showPicker) {
-      scheduleDateTime.showPicker();
-    }
+    // ❌ REMOVIDO: scheduleDateTime.showPicker()
   }
 });
 
-
-// LÓGICA DE VISIBILIDAD DEL LÍMITE DE REPETICIÓN (count, endDate)
+// =========================
+// LÍMITE REPETICIÓN (FIX)
+// =========================
 function handleRepeatLimitChange() {
-  // Ocultar ambos inputs antes de mostrar el correcto
+
   repeatCount.style.display = 'none';
   recipients.style.display = 'none';
   lblRecipients.style.display = 'none';
   endDate.style.display = 'none';
 
   if (repeatLimitType.value === 'QUANTITY') {
-    // Mostrar el campo de cantidad de repeticiones
+
     repeatCount.style.display = 'inline-block';
-    repeatCount.focus(); // Dar foco al campo de cantidad
+    repeatCount.focus();
 
   } else if (repeatLimitType.value === 'END_DATE') {
-    // Mostrar el campo de fecha de término
-    endDate.style.display = 'inline-block';
-    endDate.focus(); // Dar foco al campo de fecha
 
-    // Abrir el date picker automáticamente si es soportado
-    if (endDate.showPicker) {
-      endDate.showPicker();
-    }
+    endDate.style.display = 'inline-block';
+    endDate.focus();
+
+    // ❌ REMOVIDO: endDate.showPicker()
   }
 
   recipients.style.display = 'inline-block';
   lblRecipients.style.display = 'inline-block';
 }
 
-// Escuchar cambios en el selector de tipo de límite
 repeatLimitType.addEventListener('change', handleRepeatLimitChange);
 
-
-// Guardar plantilla
+// =========================
+// SAVE TEMPLATE
+// =========================
 document.getElementById('saveTemplate').addEventListener('click', () => {
+
   const templateName = document.getElementById('templateName').value.trim();
   const htmlContent = htmlInput.value;
   const jsonExample = document.getElementById('jsonRequestExample').value.trim();
@@ -201,7 +219,6 @@ document.getElementById('saveTemplate').addEventListener('click', () => {
   } else if (frequency === 'D') {
     time = dailyTime.value;
 
-    // Obtener los datos del límite de repetición
     const limitType = repeatLimitType.value;
     repeatLimit.type = limitType;
 
@@ -224,23 +241,23 @@ document.getElementById('saveTemplate').addEventListener('click', () => {
   alert(`Plantilla "${templateName}" lista para enviar al servidor`);
 });
 
-// Preview (Modificado para reemplazar rutas de imagen)
+// =========================
+// PREVIEW (SIN CAMBIOS)
+// =========================
 function updatePreview() {
   let htmlCode = htmlInput.value;
 
-  // 1. Iterar sobre las imágenes subidas
   for (const fileName in uploadedImages) {
     if (uploadedImages.hasOwnProperty(fileName)) {
-      const base64Url = uploadedImages[fileName];
 
-      // 2. Construir la ruta de producción que queremos reemplazar
+      const base64Url = uploadedImages[fileName];
       const standardPath = `img/${fileName}`;
 
-      // 3. Crear una expresión regular para encontrar todas las ocurrencias de esa ruta
-      // Usamos 'g' para reemplazo global y escapamos caracteres especiales como '.'
-      const regex = new RegExp(standardPath.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&'), 'g');
+      const regex = new RegExp(
+        standardPath.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&'),
+        'g'
+      );
 
-      // 4. Reemplazar la ruta de producción por la URL Base64 SOLO para el preview
       htmlCode = htmlCode.replace(regex, base64Url);
     }
   }
@@ -251,11 +268,15 @@ function updatePreview() {
   frameDoc.close();
 }
 
-// Maximizar con doble clic
+// =========================
+// FULLSCREEN + LOAD HTML (SIN CAMBIOS)
+// =========================
 htmlInput.addEventListener('dblclick', () => toggleFullscreen(htmlInput));
 previewFrame.addEventListener('dblclick', () => toggleFullscreen(previewFrame));
+
 function toggleFullscreen(element) {
   element.classList.toggle('fullscreen');
+
   if (element.classList.contains('fullscreen')) {
     if (element === htmlInput) rightPane.style.display = 'none';
     if (element === previewFrame) leftPane.style.display = 'none';
@@ -265,7 +286,6 @@ function toggleFullscreen(element) {
   }
 }
 
-// Cargar archivo HTML desde filesystem
 const loadHTMLBtn = document.getElementById('loadHTML');
 const fileHTMLInput = document.getElementById('fileHTMLInput');
 
@@ -273,13 +293,15 @@ loadHTMLBtn.addEventListener('click', () => fileHTMLInput.click());
 
 fileHTMLInput.addEventListener('change', () => {
   const file = fileHTMLInput.files[0];
+
   if (file) {
     const reader = new FileReader();
+
     reader.onload = e => {
       htmlInput.value = e.target.result;
-      // Llamar a updatePreview() para cargar el contenido y aplicar el reemplazo de imágenes
       updatePreview();
     };
+
     reader.readAsText(file);
   }
 });

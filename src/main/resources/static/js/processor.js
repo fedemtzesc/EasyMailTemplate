@@ -24,10 +24,11 @@ async function processWYSIWYG() {
 			method: "POST",
 			body: formData
 		});
+
 		const result = await response.json();
 
 		console.log(result);
-		
+
 		if (response.ok) {
 			alert(result.message);
 		} else {
@@ -41,12 +42,21 @@ async function processWYSIWYG() {
 }
 
 
+// =====================================================
+// STATE BRIDGE (IMPORTANTE PARA EDIT MODE VS CREATE)
+// =====================================================
+let imageSource = {};
+
+
+// =====================================================
+// DOM READY INIT
+// =====================================================
 document.addEventListener("DOMContentLoaded", function () {
 
   if (editMode && viewDTO) {
 
     // =========================
-    // 1. CAMPOS DEL FORMULARIO
+    // 1. FORM
     // =========================
     document.getElementById("templateName").value = viewDTO.templateName || "";
     document.getElementById("description").value = viewDTO.description || "";
@@ -59,28 +69,45 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("recipients").value = viewDTO.emailList || "";
 
     // =========================
-    // 2. HTML EDITOR
+    // 2. HTML
     // =========================
     document.getElementById("htmlInput").value = viewDTO.htmlInput || "";
 
     // =========================
-    // 3. FRECUENCIA UI (IMPORTANTE)
+    // 3. UI EVENTS
     // =========================
-    sendFrequency.dispatchEvent(new Event("change"));
-    repeatLimitType.dispatchEvent(new Event("change"));
+    document.getElementById("sendFrequency")
+      .dispatchEvent(new Event("change"));
+
+    document.getElementById("repeatLimitType")
+      .dispatchEvent(new Event("change"));
 
     // =========================
-    // 4. IMÁGENES (si ya vienen del backend)
+    // 4. IMAGE BRIDGE (CLAVE 🔥)
     // =========================
     if (viewDTO.images) {
-      for (const fileName in viewDTO.images) {
-        uploadedImages[fileName] = viewDTO.images[fileName];
-      }
+      imageSource = viewDTO.images;
     }
 
     // =========================
-    // 5. PREVIEW FINAL
+    // 5. PREVIEW
     // =========================
     updatePreview();
+
+    // =========================
+    // 6. THUMBNAILS (SIN DELAY, SIN HACKS)
+    // =========================
+    const imageList = document.getElementById("imageList");
+
+    if (viewDTO.images) {
+      imageList.innerHTML = "";
+
+      for (const fileName in viewDTO.images) {
+        const img = document.createElement("img");
+        img.src = viewDTO.images[fileName];
+        img.style.width = "100px";
+        imageList.appendChild(img);
+      }
+    }
   }
 });
