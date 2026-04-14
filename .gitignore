@@ -37,4 +37,4 @@ build/
 .vscode/
 
 ## Carpetas creadas por mi app ##
-src/main/resources/static/f*
+src/main/resources/static/emails

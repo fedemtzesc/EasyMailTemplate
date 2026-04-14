@@ -23,49 +23,49 @@ const endDate = document.getElementById('endDate');
 const docModal = document.getElementById('docModal');
 
 // Objeto para almacenar las imágenes subidas
-const uploadedImages = {};
+window.uploadedImages = window.uploadedImages || {};
 
 // =========================
 // MODAL
 // =========================
 function openDocModal() {
-  docModal.style.display = 'flex';
+	docModal.style.display = 'flex';
 }
 
 function closeDocModal() {
-  docModal.style.display = 'none';
+	docModal.style.display = 'none';
 }
 
 docModal.addEventListener('click', (event) => {
-  if (event.target === docModal) {
-    closeDocModal();
-  }
+	if (event.target === docModal) {
+		closeDocModal();
+	}
 });
 
 // =========================
 // RESIZE
 // =========================
 handle.addEventListener('mousedown', e => {
-  isResizing = true;
-  document.body.style.cursor = 'ns-resize';
+	isResizing = true;
+	document.body.style.cursor = 'ns-resize';
 });
 
 document.addEventListener('mousemove', e => {
-  if (!isResizing) return;
+	if (!isResizing) return;
 
-  let containerTop = configSection.getBoundingClientRect().top;
-  let newHeight = e.clientY - containerTop;
+	let containerTop = configSection.getBoundingClientRect().top;
+	let newHeight = e.clientY - containerTop;
 
-  if (newHeight < 50) newHeight = 50;
-  if (newHeight > leftPane.clientHeight - 50) newHeight = leftPane.clientHeight - 50;
+	if (newHeight < 50) newHeight = 50;
+	if (newHeight > leftPane.clientHeight - 50) newHeight = leftPane.clientHeight - 50;
 
-  configSection.style.flex = '0 0 ' + newHeight + 'px';
-  editorSection.style.flex = '1';
+	configSection.style.flex = '0 0 ' + newHeight + 'px';
+	editorSection.style.flex = '1';
 });
 
 document.addEventListener('mouseup', e => {
-  isResizing = false;
-  document.body.style.cursor = 'default';
+	isResizing = false;
+	document.body.style.cursor = 'default';
 });
 
 // =========================
@@ -75,101 +75,92 @@ const imageUpload = document.getElementById('imageUpload');
 const imageList = document.getElementById('imageList');
 
 imageUpload.addEventListener("change", () => {
-  imageList.innerHTML = "";
+	imageList.innerHTML = "";
 
-  // limpiar estado anterior
-  for (const key in uploadedImages) {
-    if (uploadedImages.hasOwnProperty(key)) {
-      delete uploadedImages[key];
-    }
-  }
+	// limpiar estado anterior
+	window.uploadedImages = {};
 
-  const files = [...imageUpload.files];
+	const files = [...imageUpload.files];
 
-  const MAX_SIZE = 500 * 1024; // 500KB
+	const MAX_SIZE = 500 * 1024; // 500KB
 
-  // 🔥 VALIDACIÓN GLOBAL (si UNA falla, se cancela TODO)
-  const invalidFile = files.find(file => file.size > MAX_SIZE);
+	// 🔥 VALIDACIÓN GLOBAL (si UNA falla, se cancela TODO)
+	const invalidFile = files.find(file => file.size > MAX_SIZE);
 
-  if (invalidFile) {
-    alert(`La imagen "${invalidFile.name}" excede el límite de 500KB. No se cargará ninguna imagen.`);
+	if (invalidFile) {
+		alert(`La imagen "${invalidFile.name}" excede el límite de 500KB. No se cargará ninguna imagen.`);
 
-    // limpiar input para evitar estado inconsistente
-    imageUpload.value = "";
+		// limpiar input para evitar estado inconsistente
+		imageUpload.value = "";
 
-    return; // 🚫 ABORTA TODO EL PROCESO
-  }
+		return; // 🚫 ABORTA TODO EL PROCESO
+	}
 
-  // =========================
-  // SOLO SI TODO ES VÁLIDO
-  // =========================
-  files.forEach(file => {
-    const reader = new FileReader();
-    const fileName = file.name;
 
-    reader.onload = e => {
-      const imageUrl = e.target.result;
+	files.forEach(file => {
+		const reader = new FileReader();
+		const fileName = file.name;
 
-      // guardar en estado
-      uploadedImages[fileName] = imageUrl;
+		reader.onload = e => {
+			const imageUrl = e.target.result;
 
-      // crear miniatura
-      const img = document.createElement("img");
-      img.src = imageUrl;
-      img.title = fileName;
+			// guardar en estado
+			window.uploadedImages[fileName] = imageUrl;
 
-      imageList.appendChild(img);
+			// crear miniatura
+			const img = document.createElement("img");
+			img.src = imageUrl;
+			img.title = fileName;
 
-      // actualizar preview
-      updatePreview();
+			imageList.appendChild(img);
 
-      // scroll al final
-      configSection.scrollTop = configSection.scrollHeight;
-    };
+			// actualizar preview
+			updatePreview();
 
-    reader.readAsDataURL(file);
-  });
+			// scroll al final
+			configSection.scrollTop = configSection.scrollHeight;
+		};
+
+		reader.readAsDataURL(file);
+	});
 });
 
 
-// =========================
-// FRECUENCIA (FIX: SIN showPicker)
-// =========================
 sendFrequency.addEventListener('change', () => {
 
-  dailyTime.style.display = 'none';
-  scheduleDateTime.style.display = 'none';
-  dailyLimitContainer.classList.add('hidden');
+	dailyTime.style.display = 'none';
+	scheduleDateTime.style.display = 'none';
+	dailyLimitContainer.classList.add('hidden');
 
-  repeatCount.style.display = 'none';
-  recipients.style.display = 'none';
-  lblRecipients.style.display = 'none';
-  endDate.style.display = 'none';
+	repeatCount.style.display = 'none';
+	recipients.style.display = 'none';
+	lblRecipients.style.display = 'none';
+	endDate.style.display = 'none';
 
-  if (sendFrequency.value === 'D') {
+	if (sendFrequency.value === 'D') {
 
-    dailyTime.style.display = 'inline-block';
-    recipients.style.display = 'inline-block';
-    lblRecipients.style.display = 'inline-block';
-    dailyLimitContainer.classList.remove('hidden');
+		dailyTime.style.display = 'inline-block';
+		recipients.style.display = 'inline-block';
+		lblRecipients.style.display = 'inline-block';
+		dailyLimitContainer.classList.remove('hidden');
 
-    // ❌ REMOVIDO: dailyTime.showPicker()
+		// ❌ REMOVIDO: dailyTime.showPicker()
 
-    setTimeout(() => {
-      repeatLimitType.focus();
-      handleRepeatLimitChange();
-    }, 100);
+		setTimeout(() => {
+			repeatLimitType.focus();
+			handleRepeatLimitChange();
+		}, 100);
 
-  } else if (sendFrequency.value === 'S') {
+	} else if (sendFrequency.value === 'S') {
 
-    scheduleDateTime.style.display = 'inline-block';
-    recipients.style.display = 'inline-block';
-    lblRecipients.style.display = 'inline-block';
+		scheduleDateTime.style.display = 'inline-block';
+		recipients.style.display = 'inline-block';
+		lblRecipients.style.display = 'inline-block';
 
-    scheduleDateTime.focus();
+		scheduleDateTime.focus();
 
-    // ❌ REMOVIDO: scheduleDateTime.showPicker()
-  }
+		// ❌ REMOVIDO: scheduleDateTime.showPicker()
+	}
 });
 
 // =========================
@@ -177,26 +168,26 @@ sendFrequency.addEventListener('change', () => {
 // =========================
 function handleRepeatLimitChange() {
 
-  repeatCount.style.display = 'none';
-  recipients.style.display = 'none';
-  lblRecipients.style.display = 'none';
-  endDate.style.display = 'none';
+	repeatCount.style.display = 'none';
+	recipients.style.display = 'none';
+	lblRecipients.style.display = 'none';
+	endDate.style.display = 'none';
 
-  if (repeatLimitType.value === 'QUANTITY') {
+	if (repeatLimitType.value === 'QUANTITY') {
 
-    repeatCount.style.display = 'inline-block';
-    repeatCount.focus();
+		repeatCount.style.display = 'inline-block';
+		repeatCount.focus();
 
-  } else if (repeatLimitType.value === 'END_DATE') {
+	} else if (repeatLimitType.value === 'END_DATE') {
 
-    endDate.style.display = 'inline-block';
-    endDate.focus();
+		endDate.style.display = 'inline-block';
+		endDate.focus();
 
-    // ❌ REMOVIDO: endDate.showPicker()
-  }
+		// ❌ REMOVIDO: endDate.showPicker()
+	}
 
-  recipients.style.display = 'inline-block';
-  lblRecipients.style.display = 'inline-block';
+	recipients.style.display = 'inline-block';
+	lblRecipients.style.display = 'inline-block';
 }
 
 repeatLimitType.addEventListener('change', handleRepeatLimitChange);
@@ -206,66 +197,68 @@ repeatLimitType.addEventListener('change', handleRepeatLimitChange);
 // =========================
 document.getElementById('saveTemplate').addEventListener('click', () => {
 
-  const templateName = document.getElementById('templateName').value.trim();
-  const htmlContent = htmlInput.value;
-  const jsonExample = document.getElementById('jsonRequestExample').value.trim();
-  const frequency = sendFrequency.value;
+	const templateName = document.getElementById('templateName').value.trim();
+	const htmlContent = htmlInput.value;
+	const jsonExample = document.getElementById('jsonRequestExample').value.trim();
+	const frequency = sendFrequency.value;
 
-  let time = '';
-  let repeatLimit = { type: 'none', value: null };
+	let time = '';
+	let repeatLimit = { type: 'none', value: null };
 
-  if (frequency === 'S') {
-    time = scheduleDateTime.value;
-  } else if (frequency === 'D') {
-    time = dailyTime.value;
+	if (frequency === 'S') {
+		time = scheduleDateTime.value;
+	} else if (frequency === 'D') {
+		time = dailyTime.value;
 
-    const limitType = repeatLimitType.value;
-    repeatLimit.type = limitType;
+		const limitType = repeatLimitType.value;
+		repeatLimit.type = limitType;
 
-    if (limitType === 'count') {
-      repeatLimit.value = repeatCount.value;
-    } else if (limitType === 'date') {
-      repeatLimit.value = endDate.value;
-    }
-  }
+		if (limitType === 'count') {
+			repeatLimit.value = repeatCount.value;
+		} else if (limitType === 'date') {
+			repeatLimit.value = endDate.value;
+		}
+	}
 
-  console.log({
-    templateName,
-    htmlContent,
-    jsonExample,
-    frequency,
-    time,
-    repeatLimit
-  });
+	console.log({
+		templateName,
+		htmlContent,
+		jsonExample,
+		frequency,
+		time,
+		repeatLimit
+	});
 
-  alert(`Plantilla "${templateName}" lista para enviar al servidor`);
+	alert(`Plantilla "${templateName}" lista para enviar al servidor`);
 });
 
 // =========================
 // PREVIEW (SIN CAMBIOS)
 // =========================
 function updatePreview() {
-  let htmlCode = htmlInput.value;
+	const images = window.uploadedImages || {};
+	let htmlCode = htmlInput.value;
 
-  for (const fileName in uploadedImages) {
-    if (uploadedImages.hasOwnProperty(fileName)) {
+	for (const fileName in images) {
+		if (!Object.prototype.hasOwnProperty.call(images, fileName)) continue;
 
-      const base64Url = uploadedImages[fileName];
-      const standardPath = `img/${fileName}`;
+		const base64Url = images[fileName];
+		const standardPath = `img/${fileName}`;
 
-      const regex = new RegExp(
-        standardPath.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&'),
-        'g'
-      );
 
-      htmlCode = htmlCode.replace(regex, base64Url);
-    }
-  }
 
-  const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-  frameDoc.open();
-  frameDoc.write(htmlCode);
-  frameDoc.close();
+		const regex = new RegExp(
+			standardPath.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&'),
+			'g'
+		);
+
+		htmlCode = htmlCode.replace(regex, base64Url);
+	}
+
+	const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+	frameDoc.open();
+	frameDoc.write(htmlCode);
+	frameDoc.close();
 }
 
 // =========================
@@ -275,15 +268,15 @@ htmlInput.addEventListener('dblclick', () => toggleFullscreen(htmlInput));
 previewFrame.addEventListener('dblclick', () => toggleFullscreen(previewFrame));
 
 function toggleFullscreen(element) {
-  element.classList.toggle('fullscreen');
+	element.classList.toggle('fullscreen');
 
-  if (element.classList.contains('fullscreen')) {
-    if (element === htmlInput) rightPane.style.display = 'none';
-    if (element === previewFrame) leftPane.style.display = 'none';
-  } else {
-    rightPane.style.display = 'flex';
-    leftPane.style.display = 'flex';
-  }
+	if (element.classList.contains('fullscreen')) {
+		if (element === htmlInput) rightPane.style.display = 'none';
+		if (element === previewFrame) leftPane.style.display = 'none';
+	} else {
+		rightPane.style.display = 'flex';
+		leftPane.style.display = 'flex';
+	}
 }
 
 const loadHTMLBtn = document.getElementById('loadHTML');
@@ -292,16 +285,40 @@ const fileHTMLInput = document.getElementById('fileHTMLInput');
 loadHTMLBtn.addEventListener('click', () => fileHTMLInput.click());
 
 fileHTMLInput.addEventListener('change', () => {
-  const file = fileHTMLInput.files[0];
+	const file = fileHTMLInput.files[0];
 
-  if (file) {
-    const reader = new FileReader();
+	if (file) {
+		const reader = new FileReader();
 
-    reader.onload = e => {
-      htmlInput.value = e.target.result;
-      updatePreview();
-    };
+		reader.onload = e => {
+			htmlInput.value = e.target.result;
+			updatePreview();
+		};
 
-    reader.readAsText(file);
-  }
+		reader.readAsText(file);
+	}
 });
+
+function resetByFrequency(frequency) {
+	if (frequency === 'I') {
+		resetFields(["scheduleDateTime", "dailyTime", "repeatLimitType", "repeatCount", "endDate"]);
+	}
+
+	if (frequency === 'S') {
+		resetFields(["dailyTime", "repeatLimitType", "repeatCount", "endDate"]);
+	}
+
+	if (frequency === 'D') {
+		resetFields(["scheduleDateTime", "repeatCount", "endDate"]);
+	}
+}
+
+document.getElementById("sendFrequency").addEventListener("change", (e) => {
+	resetByFrequency(e.target.value);
+});
+
+
+htmlInput.addEventListener('input', updatePreview);
+
+
+

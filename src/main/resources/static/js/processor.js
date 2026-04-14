@@ -18,6 +18,9 @@ async function processWYSIWYG() {
 	for (let i = 0; i < files.length; i++) {
 		formData.append("images", files[i]);
 	}
+	
+	if(!isValidWYSIWYGFormDataBeforePersist())
+		return;
 
 	try {
 		const response = await fetch("/api/v1/wysiwyg", {
@@ -40,12 +43,6 @@ async function processWYSIWYG() {
 		alert("Ocurrió un error inesperado al guardar la plantilla");
 	}
 }
-
-
-// =====================================================
-// STATE BRIDGE (IMPORTANTE PARA EDIT MODE VS CREATE)
-// =====================================================
-let imageSource = {};
 
 
 // =====================================================
@@ -85,8 +82,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // 4. IMAGE BRIDGE (CLAVE 🔥)
     // =========================
+	window.uploadedImages = {};
     if (viewDTO.images) {
-      imageSource = viewDTO.images;
+	  window.uploadedImages = { ...(viewDTO.images || {}) };
     }
 
     // =========================
@@ -102,12 +100,31 @@ document.addEventListener("DOMContentLoaded", function () {
     if (viewDTO.images) {
       imageList.innerHTML = "";
 
-      for (const fileName in viewDTO.images) {
-        const img = document.createElement("img");
-        img.src = viewDTO.images[fileName];
-        img.style.width = "100px";
-        imageList.appendChild(img);
-      }
+	  for (const fileName in window.uploadedImages) {
+	    const img = document.createElement("img");
+	    img.src = window.uploadedImages[fileName];
+	    img.style.width = "100px";
+	    img.title = fileName;
+	    imageList.appendChild(img);
+	  }
     }
   }
 });
+
+
+// Funcion para limpiar la forma despues de guardar los datos
+function clearForm() {
+	document.getElementById("templateName").value = '';
+	document.getElementById("description").value = '';
+	document.getElementById("sendFrequency").value = 'I';
+	document.getElementById("scheduleDateTime").value = '';
+	document.getElementById("dailyTime").value = '';
+	document.getElementById("repeatLimitType").value = 'UNLIMITED';
+	document.getElementById("repeatCount").value = '';
+	document.getElementById("endDate").value = '';
+	document.getElementById("recipients").value = '';
+	document.getElementById("htmlInput").value = '';
+
+	// archivos también
+	document.getElementById("imageUpload").value = '';
+}

@@ -38,12 +38,13 @@
                         <option value="D">Repetir todos los días a esta hora</option>
                     </select>
 
-                    <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;">
+                    <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;" lang="es">
                     <input type="time" id="dailyTime" style="margin-bottom:8px; display:none;">
 
                     <div id="dailyLimitContainer" class="hidden">
                         <label class="limit-label">Límite de Repetición:</label>
                         <select id="repeatLimitType" style="margin-bottom: 5px;">
+                        	<option value="">-- Seleccione una opción --</option>
                             <option value="UNLIMITED" selected>Sin límite (Continuo)</option>
                             <option value="QUANTITY">Por cantidad de veces</option>
                             <option value="END_DATE">Por fecha de término</option>
@@ -177,8 +178,8 @@
 	    const errorMessage = /*[[${errorMessage}]]*/ null;
 	</script>
 	
-	<script type="text/javascript" th:src="@{/js/processor.js}"></script>
-    <script type="text/javascript" th:src="@{/js/wysiwyg.js}"></script>
+	<th:block th:replace="fragments/js-scripts :: jsScripts"></th:block>
+
 </body>
 
 </html>
