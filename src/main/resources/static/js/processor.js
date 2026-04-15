@@ -1,7 +1,16 @@
+window.currentTemplateId = null;
+
 async function processWYSIWYG() {
 	const formData = new FormData();
+	let htmlVerb = "POST";
+	
+	const id = Number(window.currentTemplateId);
 
-	formData.append("id", "");
+	if (Number.isInteger(id) && id > 0) {
+	    htmlVerb = "PATCH";
+	    formData.append("id", id);
+	}
+	
 	formData.append("templateName", document.getElementById("templateName").value);
 	formData.append("description", document.getElementById("description").value);
 	formData.append("sendFrequency", document.getElementById("sendFrequency").value);
@@ -24,7 +33,7 @@ async function processWYSIWYG() {
 
 	try {
 		const response = await fetch("/api/v1/wysiwyg", {
-			method: "POST",
+			method: htmlVerb,
 			body: formData
 		});
 
@@ -55,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // 1. FORM
     // =========================
+	window.currentTemplateId = viewDTO.id ? Number(viewDTO.id) : null;
     document.getElementById("templateName").value = viewDTO.templateName || "";
     document.getElementById("description").value = viewDTO.description || "";
     document.getElementById("sendFrequency").value = viewDTO.sendFrequency || "";
@@ -64,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("repeatCount").value = viewDTO.repeatQuantity || "";
     document.getElementById("endDate").value = viewDTO.repeatEndDate || "";
     document.getElementById("recipients").value = viewDTO.emailList || "";
+	
 
     // =========================
     // 2. HTML
