@@ -30,22 +30,15 @@ function isValidWYSIWYGFormDataBeforePersist() {
 			//Limpio los campos que no se requieren
 			break;
 		case 'S': //Envio Scheduled
-			const dateTimeRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d)$/;
-			if (data.dateTimeSending.value.trim() === '') {
-				msg += '- Tiene que especificar la fecha y hora de su envio a programar.\n';
-			} else {
-				if (!dateTimeRegex.test(data.dateTimeSending.value.trim())) {
-					msg += '- La fecha y hora de su envio programado debe contener la fecha y la hora programados.\n';
-				}
-			}
+			if (!isValidISODateTime(data.dateTimeSending.value.trim()))
+				msg += '- Tiene que especificar una fecha con hora de envio validas.\n';
 			break;
 		case 'D': //Envio Daily, que se repite todos los dias a partir de la fecha de creacion, a cierta hora y por cierta cantidad de veces o por terminacion de fecha
 			if (data.repeatEachTimeAt.value.trim() === '') {
 				msg += '- Al haber elegido envio diario tiene que especificar la hora exacta en que se haran los envios diariamente.\n';
 			} else {
-				const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-				if (!timeRegex.test(data.repeatEachTimeAt.value.trim()))
-					msg += '- La hora de envio diario debe tener formato HH:mm (ejemplo: 13:00).\n';
+				if (!isValidISODateTime(data.repeatEachTimeAt.value.trim()))
+					msg += '- Tiene que especificar fecha y hora de envio iniciales que sean validas.\n';
 			}
 			switch (data.repeatLimitType.value) {
 				case 'UNLIMITED':
@@ -57,7 +50,7 @@ function isValidWYSIWYGFormDataBeforePersist() {
 					}
 					break;
 				case 'END_DATE':
-					if (!isValidDateYYYYMMDD(data.repeatEndDate.value.trim()))
+					if (!isValidISODate(data.repeatEndDate.value.trim()))
 						msg += '- Ha elegido envio diario, con fecha de terminacion, pero la fecha de terminacion es invalida!\n';
 					break;
 			}

@@ -321,4 +321,25 @@ document.getElementById("sendFrequency").addEventListener("change", (e) => {
 htmlInput.addEventListener('input', updatePreview);
 
 
+function showCatalog(){
+	alert('Showing HTML Templates Catalog!');
+}
+
+function getTemplateJSON(){
+	alert('Showing Template JSON!');
+}
+
+function showStatistics(){
+	alert('Showing Template Statistics!');
+}
+
+
+function testTemplateSending(){
+	alert('Testing template sending...');
+}
+
+function exitFromWYSIWYG(){
+	window.location.href='/templates-list';
+}
+
 

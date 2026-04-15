@@ -79,6 +79,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("repeatLimitType")
       .dispatchEvent(new Event("change"));
 
+	document.getElementById("repeatCount").value = viewDTO.repeatQuantity || "";
+	document.getElementById("endDate").value = viewDTO.repeatEndDate || "";
     // =========================
     // 4. IMAGE BRIDGE (CLAVE 🔥)
     // =========================

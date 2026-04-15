@@ -79,8 +79,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (e.target.closest(".edit-btn")) {
                         console.log("Editar plantilla:", rowData);
-                        alert(`Editar plantilla: ${rowData.templateName}`);
-						alert('Editanto plantilla con id: ' + rowData.id);
                         window.location.href = `/wysiwyg?id=${rowData.id}`;
                     }
 
@@ -89,18 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         const confirmDelete = confirm(`¿Deseas eliminar la plantilla "${rowData.templateName}"?`);
                         if (confirmDelete) {
                             alert(`Eliminar plantilla ID: ${rowData.id}`);
-                            /*
-                            fetch(`/api/v1/wysiwyg/${rowData.id}`, { method: "DELETE" })
-                                .then(resp => resp.json())
-                                .then(result => {
-                                    alert(result.message);
-                                    cell.getTable().replaceData();
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                    alert("Ocurrió un error al eliminar la plantilla");
-                                });
-                            */
                         }
                     }
                 }

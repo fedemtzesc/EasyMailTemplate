@@ -14,11 +14,15 @@
         <div class="left" id="leftPane">
             <div class="config-section" id="configSection">
                 <div class="sticky-header">
-                    <h3 th:text="${title2}">x</h3>
                     <div class="button-row">
-                        <button id="loadHTML">Cargar HTML</button>
-                        <button id="saveTemplate" onclick="processWYSIWYG()">Guardar plantilla</button>
-                        <button id="openDoc" onclick="openDocModal()">Documentación</button>
+                    	<img id="loadHTML" class="wysiwyg-button" th:src="@{img/html_upload.png}" title="Cargar plantilla HTML..."/>
+                    	<img id="saveTemplate" class="wysiwyg-button" th:src="@{img/html_save.png}" title="Guardar plantilla HTML..." onclick="processWYSIWYG()"/>
+						<img id="openDoc" class="wysiwyg-button" th:src="@{img/html_info.png}" title="Ver Ayuda / Documentacion..." onclick="openDocModal()"/>
+                        <img id="catalogHTML" class="wysiwyg-button" th:src="@{img/html_catalog.png}" title="Usar plantilla del Catalogo..." onclick="showCatalog()"/>
+                        <img id="showJSON" class="wysiwyg-button" th:src="@{img/show_json.png}" title="Obtener JSON de la Plantilla..." onclick="getTemplateJSON()"/>
+                        <img id="showSTAT" class="wysiwyg-button" th:src="@{img/html_statistics.png}" title="Mostrar Estadisticas de la Plantilla..." onclick="showStatistics()"/>
+                        <img id="testHTML" class="wysiwyg-button" th:src="@{img/html_test.png}" title="Probar envio de plantilla HTML..." onclick="testTemplateSending()"/>
+                        <img id="exitHTML" class="wysiwyg-button" th:src="@{img/html_exit.png}" title="Salir de este Modulo..." onclick="exitFromWYSIWYG()"/>      
                     </div>
                 </div>
                 <div class="config">
@@ -39,7 +43,7 @@
                     </select>
 
                     <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;" lang="es">
-                    <input type="time" id="dailyTime" style="margin-bottom:8px; display:none;">
+                    <input type="datetime-local" id="dailyTime" style="margin-bottom:8px; display:none;">
 
                     <div id="dailyLimitContainer" class="hidden">
                         <label class="limit-label">Límite de Repetición:</label>
