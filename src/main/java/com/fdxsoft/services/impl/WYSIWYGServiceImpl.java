@@ -29,6 +29,7 @@ import com.fdxsoft.controllers.dtos.GenericResponseDTO;
 import com.fdxsoft.controllers.dtos.WYSIWYGListDTO;
 import com.fdxsoft.controllers.dtos.WYSIWYGRequestDTO;
 import com.fdxsoft.controllers.dtos.WYSIWYGViewDTO;
+import com.fdxsoft.entities.SchedulerEntity;
 import com.fdxsoft.entities.WYSIWYGEntity;
 import com.fdxsoft.repositories.WYSIWYGRepository;
 import com.fdxsoft.services.WYSIWYGService;
@@ -95,52 +96,53 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 				try (Stream<Path> paths = Files.list(imgDir)) {
 
 					paths
-					  .filter(Files::isRegularFile)
-					  .forEach(path -> {
-					      try {
-					          String fileName = path.getFileName().toString();
-					          String lowerName = fileName.toLowerCase();
+							.filter(Files::isRegularFile)
+							.forEach(path -> {
+								try {
+									String fileName = path.getFileName().toString();
+									String lowerName = fileName.toLowerCase();
 
-					          if (!(lowerName.endsWith(".png") || lowerName.endsWith(".jpg") ||
-					                lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif") ||
-					                lowerName.endsWith(".webp") || lowerName.endsWith(".svg"))) {
-					              return;
-					          }
+									if (!(lowerName.endsWith(".png") || lowerName.endsWith(".jpg") ||
+											lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif") ||
+											lowerName.endsWith(".webp") || lowerName.endsWith(".svg"))) {
+										return;
+									}
 
-					          if (Files.size(path) > 2_000_000) {
-					              erroresImagenes.add("Archivo demasiado grande: " + fileName);
-					              return;
-					          }
+									if (Files.size(path) > 2_000_000) {
+										erroresImagenes.add("Archivo demasiado grande: " + fileName);
+										return;
+									}
 
-					          byte[] bytes = Files.readAllBytes(path);
-					          String base64 = Base64.getEncoder().encodeToString(bytes);
+									byte[] bytes = Files.readAllBytes(path);
+									String base64 = Base64.getEncoder().encodeToString(bytes);
 
-					          String mimeType = Files.probeContentType(path);
+									String mimeType = Files.probeContentType(path);
 
-					          if (mimeType == null) {
-					              if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
-					                  mimeType = "image/jpeg";
-					              } else if (lowerName.endsWith(".png")) {
-					                  mimeType = "image/png";
-					              } else if (lowerName.endsWith(".gif")) {
-					                  mimeType = "image/gif";
-					              } else if (lowerName.endsWith(".webp")) {
-					                  mimeType = "image/webp";
-					              } else if (lowerName.endsWith(".svg")) {
-					                  mimeType = "image/svg+xml";
-					              } else {
-					                  mimeType = "application/octet-stream";
-					              }
-					          }
+									if (mimeType == null) {
+										if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+											mimeType = "image/jpeg";
+										} else if (lowerName.endsWith(".png")) {
+											mimeType = "image/png";
+										} else if (lowerName.endsWith(".gif")) {
+											mimeType = "image/gif";
+										} else if (lowerName.endsWith(".webp")) {
+											mimeType = "image/webp";
+										} else if (lowerName.endsWith(".svg")) {
+											mimeType = "image/svg+xml";
+										} else {
+											mimeType = "application/octet-stream";
+										}
+									}
 
-					          String base64Url = "data:" + mimeType + ";base64," + base64;
+									String base64Url = "data:" + mimeType + ";base64," + base64;
 
-					          imagesMap.put(fileName, base64Url);
+									imagesMap.put(fileName, base64Url);
 
-					      } catch (IOException e) {
-					          erroresImagenes.add("Error con archivo: " + path.getFileName() + ": " + e.getMessage());
-					      }
-					  });
+								} catch (IOException e) {
+									erroresImagenes
+											.add("Error con archivo: " + path.getFileName() + ": " + e.getMessage());
+								}
+							});
 
 				} catch (IOException e) {
 					response.setMessage("Error al listar imágenes. " + e.getMessage());
@@ -203,8 +205,12 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 			response.setHttpStatus(HttpStatus.CONFLICT.value());
 			return response;
 		}
-
+		// Calculamos que datos y con que configuracion se deben guardar en la tabla
+		// Scheduler
+		wysiwygEntity.calculateSchedulerForSave();
+		// Guardamos la entidad en la base de datos con la configuracion calculada
 		WYSIWYGEntity savedEntity = wysiwygRepository.save(wysiwygEntity);
+		// Guardamos el HTML y las imagenes en la carpeta correspondiente
 		try {
 			Path templateFolder = Paths.get("src/main/resources/static/emails/f_" + savedEntity.getId());
 			Path imageFolder = templateFolder.resolve("img");
@@ -363,41 +369,43 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 			dto.setTemplateName(entity.getTemplateName());
 
 			switch (entity.getSendFrequency()) {
-			case IMMEDIATE:
-				dto.setSendFrequencyDescription("Envío inmediato");
-				dto.setRepeatLimitDescription("Envio inmediato al ser llamado via API REST.");
-				break;
-
-			case SCHEDULED:
-				dto.setSendFrequencyDescription("Envio en fecha programada");
-				dto.setRepeatLimitDescription("El envio sera realizado el dia "
-						+ DateTimeUtils.descriptiveFormat(entity.getDateTimeSending()));
-				break;
-
-			case DAILY:
-				dto.setSendFrequencyDescription("Envio diario a cierta hora.");
-
-				switch (entity.getRepeatLimitType()) {
-				case UNLIMITED:
-					dto.setRepeatLimitDescription("Sin límite de terminacion.");
+				case IMMEDIATE:
+					dto.setSendFrequencyDescription("Envío inmediato");
+					dto.setRepeatLimitDescription("Envio inmediato al ser llamado via API REST.");
 					break;
 
-				case QUANTITY:
-					dto.setRepeatLimitDescription(
-							entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt() + ". A partir del dia" + entity.getRepeatEachTimeAt());
+				case SCHEDULED:
+					dto.setSendFrequencyDescription("Envio en fecha programada");
+					dto.setRepeatLimitDescription("El envio sera realizado el dia "
+							+ DateTimeUtils.descriptiveFormat(entity.getDateTimeSending()));
 					break;
 
-				case END_DATE:
-					dto.setRepeatLimitDescription("Del dia " + entity.getRepeatEachTimeAt() + " al día " + entity.getRepeatEndDate());
+				case DAILY:
+					dto.setSendFrequencyDescription("Envio diario a cierta hora.");
+
+					switch (entity.getRepeatLimitType()) {
+						case UNLIMITED:
+							dto.setRepeatLimitDescription("Sin límite de terminacion.");
+							break;
+
+						case QUANTITY:
+							dto.setRepeatLimitDescription(
+									entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt()
+											+ ". A partir del dia" + entity.getRepeatEachTimeAt());
+							break;
+
+						case END_DATE:
+							dto.setRepeatLimitDescription(
+									"Del dia " + entity.getRepeatEachTimeAt() + " al día " + entity.getRepeatEndDate());
+							break;
+
+						default:
+							dto.setRepeatLimitDescription("REPETICION DE ENVIO INVALIDA");
+					}
 					break;
 
 				default:
-					dto.setRepeatLimitDescription("REPETICION DE ENVIO INVALIDA");
-				}
-				break;
-
-			default:
-				dto.setSendFrequencyDescription("PROGRAMACION DE ENVIO INVALIDA");
+					dto.setSendFrequencyDescription("PROGRAMACION DE ENVIO INVALIDA");
 			}
 
 			return dto;
@@ -479,5 +487,4 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 
 		return wysiwygEntity;
 	}
-
 }

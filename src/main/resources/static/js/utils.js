@@ -52,3 +52,16 @@ function isValidISODateTime(dateStr) {
 function resetFields(ids) {
 	ids.forEach(id => document.getElementById(id).value = '');
 }
+
+
+function getTimePart(dateStr) {
+	if (dateStr.trim() === '')
+		return 'T00:00:00';
+
+	let pos = dateStr.indexOf('T');
+	if (pos >= 0) {
+		return dateStr.substring(pos);
+	} else {
+		return 'T00:00:00';
+	}
+}

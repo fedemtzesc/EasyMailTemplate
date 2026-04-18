@@ -1,0 +1,60 @@
+------	---------	-------------	-----------------------------------------------------------------------------------------------------
+ESTADO	PARA DIA  	TERMINADO EL	DESCRIPCION DE LA TAREA O PENDIENTE
+------	---------	-------------	-----------------------------------------------------------------------------------------------------
+ []		24/04/2026					@feature: Desarrollar modulo de cambio de password por el usuario mismo
+ 
+ []		23/04/2026					@feature: Desarrollar modulo de administracion de usuarios con las siguientes 
+ 									funcionalidades:
+ 										- Listado de usuarios
+ 										- CRUD
+
+ []		22/04/2026					@feature: Desarrollar Motor de Envios Inmediatos
+ 									   - Sus responsabilidades seran:
+ 									   		* Recibir el Request con los parametros de los place-holders de la plantilla
+ 									   		* En caso de que el Request incluya archivos a enviar, extraerlos para enviarlos por email
+ 									   		* Obtener la plantilla HTML de su folder f_x y extraerle su texto HTML
+ 									   		* Reemplazar en el texto HTML:
+ 									   			+ Los placeholders con los parametros del Request
+ 									   		 	+ los paths a los tags IMG por el path real de la aplicacion
+ 									   		* Mandar llamar al Motor de Envio de Email pasandole:
+ 									   			 + El texto HTML
+ 									   			 + Los archivos que iran como anexos y que se extrajeron del Request
+ 									   		* Retornar la respuesta JSON en base a la respuesta del Motor de Envio de Emails  
+ 									
+ []		21/04/2026					@feature: Desarrollar Motor de Envios Programados en BD
+ 										- Sus responsabilidades seran:
+ 											* Recuperar de la BD, la lista de envios programados que ya se tienen que ejecutar
+ 											* Iterar la lista y por cada item generar un hilo que hara lo siguiente:
+ 												+ Obtener la plantilla HTML de su folder f_x y extraerle su texto HTML
+ 												+ Reemplazar en el texto HTML:
+ 									   				> Los placeholders con los parametros del Request
+ 									   		 		> los paths a los tags IMG por el path real de la aplicacion
+ 									   		* Obtener los recipientes de los remitentes del correo
+ 									   		* Mandar llamar al Motor de Envio de Email pasandole:
+ 									   			 + El texto HTML
+ 									   		* Actualizar el registro del Envio Programado en base a la respuesta del Motor de Envio de Email
+ 
+ []		20/04/2026					@feature: Desarrollar Motor de Envio de Emails
+ 										- Sus unicas responsabilidades son:
+ 											* Crear el objeto de correo
+ 											* Setear los parametros del correo, subject, mensaje, destinatarios, etc...
+ 											* Setear los archivos e enviar en caso de que haya
+ 											* Intentar enviar el correo
+ 											* Regresar un resultado exitoso o fallido del intento de envio de correo								
+ 										
+ []		19/04/2026					@feature: Desarrollar modulo de configuracion de parametros generales del sistema
+ 										- Parametros para los envios de correos SMTP
+ 											* Usuario
+ 											* Password
+ 											* IP
+ 											* Puerto
+ 										- Cantidad maxima de intentos de envio de correo
+ 										- Tiempo maximo de espera por respuesta de un envio de correo (en segundos) 
+ 										- Tiempo de espera de consulta en BD para motor de envios programados
+ 
+
+ [X] 	18/04/2026	18/04/2026T15	@FEATURE: Al momento de guardar la informacion de una plantilla generar los datos de su programacion 
+									para la tabla schedule, dependiendo de cada diferente configuracion de envio de plantilla
+ 
+ 
+  

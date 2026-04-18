@@ -195,42 +195,8 @@ repeatLimitType.addEventListener('change', handleRepeatLimitChange);
 // =========================
 // SAVE TEMPLATE
 // =========================
-document.getElementById('saveTemplate').addEventListener('click', () => {
+document.getElementById('saveTemplate').addEventListener('click', processWYSIWYG);
 
-	const templateName = document.getElementById('templateName').value.trim();
-	const htmlContent = htmlInput.value;
-	const jsonExample = document.getElementById('jsonRequestExample').value.trim();
-	const frequency = sendFrequency.value;
-
-	let time = '';
-	let repeatLimit = { type: 'none', value: null };
-
-	if (frequency === 'S') {
-		time = scheduleDateTime.value;
-	} else if (frequency === 'D') {
-		time = dailyTime.value;
-
-		const limitType = repeatLimitType.value;
-		repeatLimit.type = limitType;
-
-		if (limitType === 'count') {
-			repeatLimit.value = repeatCount.value;
-		} else if (limitType === 'date') {
-			repeatLimit.value = endDate.value;
-		}
-	}
-
-	console.log({
-		templateName,
-		htmlContent,
-		jsonExample,
-		frequency,
-		time,
-		repeatLimit
-	});
-
-	alert(`Plantilla "${templateName}" lista para enviar al servidor`);
-});
 
 // =========================
 // PREVIEW (SIN CAMBIOS)
@@ -321,25 +287,25 @@ document.getElementById("sendFrequency").addEventListener("change", (e) => {
 htmlInput.addEventListener('input', updatePreview);
 
 
-function showCatalog(){
+function showCatalog() {
 	alert('Showing HTML Templates Catalog!');
 }
 
-function getTemplateJSON(){
+function getTemplateJSON() {
 	alert('Showing Template JSON!');
 }
 
-function showStatistics(){
+function showStatistics() {
 	alert('Showing Template Statistics!');
 }
 
 
-function testTemplateSending(){
+function testTemplateSending() {
 	alert('Testing template sending...');
 }
 
-function exitFromWYSIWYG(){
-	window.location.href='/templates-list';
+function exitFromWYSIWYG() {
+	window.location.href = '/templates-list';
 }
 
 

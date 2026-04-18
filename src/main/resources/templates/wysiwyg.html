@@ -15,14 +15,22 @@
             <div class="config-section" id="configSection">
                 <div class="sticky-header">
                     <div class="button-row">
-                    	<img id="loadHTML" class="wysiwyg-button" th:src="@{img/html_upload.png}" title="Cargar plantilla HTML..."/>
-                    	<img id="saveTemplate" class="wysiwyg-button" th:src="@{img/html_save.png}" title="Guardar plantilla HTML..." onclick="processWYSIWYG()"/>
-						<img id="openDoc" class="wysiwyg-button" th:src="@{img/html_info.png}" title="Ver Ayuda / Documentacion..." onclick="openDocModal()"/>
-                        <img id="catalogHTML" class="wysiwyg-button" th:src="@{img/html_catalog.png}" title="Usar plantilla del Catalogo..." onclick="showCatalog()"/>
-                        <img id="showJSON" class="wysiwyg-button" th:src="@{img/show_json.png}" title="Obtener JSON de la Plantilla..." onclick="getTemplateJSON()"/>
-                        <img id="showSTAT" class="wysiwyg-button" th:src="@{img/html_statistics.png}" title="Mostrar Estadisticas de la Plantilla..." onclick="showStatistics()"/>
-                        <img id="testHTML" class="wysiwyg-button" th:src="@{img/html_test.png}" title="Probar envio de plantilla HTML..." onclick="testTemplateSending()"/>
-                        <img id="exitHTML" class="wysiwyg-button" th:src="@{img/html_exit.png}" title="Salir de este Modulo..." onclick="exitFromWYSIWYG()"/>      
+                        <img id="loadHTML" class="wysiwyg-button" th:src="@{img/html_upload.png}"
+                            title="Cargar plantilla HTML..." />
+                        <img id="saveTemplate" class="wysiwyg-button" th:src="@{img/html_save.png}"
+                            title="Guardar plantilla HTML..." />
+                        <img id="openDoc" class="wysiwyg-button" th:src="@{img/html_info.png}"
+                            title="Ver Ayuda / Documentacion..." onclick="openDocModal()" />
+                        <img id="catalogHTML" class="wysiwyg-button" th:src="@{img/html_catalog.png}"
+                            title="Usar plantilla del Catalogo..." onclick="showCatalog()" />
+                        <img id="showJSON" class="wysiwyg-button" th:src="@{img/show_json.png}"
+                            title="Obtener JSON de la Plantilla..." onclick="getTemplateJSON()" />
+                        <img id="showSTAT" class="wysiwyg-button" th:src="@{img/html_statistics.png}"
+                            title="Mostrar Estadisticas de la Plantilla..." onclick="showStatistics()" />
+                        <img id="testHTML" class="wysiwyg-button" th:src="@{img/html_test.png}"
+                            title="Probar envio de plantilla HTML..." onclick="testTemplateSending()" />
+                        <img id="exitHTML" class="wysiwyg-button" th:src="@{img/html_exit.png}"
+                            title="Salir de este Modulo..." onclick="exitFromWYSIWYG()" />
                     </div>
                 </div>
                 <div class="config">
@@ -42,13 +50,14 @@
                         <option value="DAILY">Repetir todos los días a esta hora</option>
                     </select>
 
-                    <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;" lang="es">
+                    <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;"
+                        lang="es">
                     <input type="datetime-local" id="dailyTime" style="margin-bottom:8px; display:none;">
 
                     <div id="dailyLimitContainer" class="hidden">
                         <label class="limit-label">Límite de Repetición:</label>
                         <select id="repeatLimitType" style="margin-bottom: 5px;">
-                        	<option value="">-- Seleccione una opción --</option>
+                            <option value="">-- Seleccione una opción --</option>
                             <option value="UNLIMITED" selected>Sin límite (Continuo)</option>
                             <option value="QUANTITY">Por cantidad de veces</option>
                             <option value="END_DATE">Por fecha de término</option>
@@ -63,7 +72,8 @@
                     <input type="text" id="recipients" placeholder="emails (separados por coma)">
 
                     <label>Subir imágenes de la plantilla (jpeg, gif, png, jpg, etc...):</label>
-                    <input type="file" id="imageUpload" title="Haga click aqui para seleccionar sus archivos..." multiple accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
+                    <input type="file" id="imageUpload" title="Haga click aqui para seleccionar sus archivos..."
+                        multiple accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
                     <div id="imageList"></div>
                 </div>
 
@@ -175,14 +185,14 @@
             <button id="closeModalBtn" onclick="closeDocModal()">Cerrar</button>
         </div>
     </div>
-    
-	<script th:inline="javascript">
-	    const viewDTO = /*[[${viewDTO}]]*/ null;
-	    const editMode = /*[[${editMode}]]*/ false;
-	    const errorMessage = /*[[${errorMessage}]]*/ null;
-	</script>
-	
-	<th:block th:replace="fragments/js-scripts :: jsScripts"></th:block>
+
+    <script th:inline="javascript">
+        const viewDTO = /*[[${viewDTO}]]*/ null;
+        const editMode = /*[[${editMode}]]*/ false;
+        const errorMessage = /*[[${errorMessage}]]*/ null;
+    </script>
+
+    <th:block th:replace="fragments/js-scripts :: jsScripts"></th:block>
 
 </body>
 

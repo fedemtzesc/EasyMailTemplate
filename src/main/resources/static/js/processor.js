@@ -1,25 +1,29 @@
 window.currentTemplateId = null;
 
 async function processWYSIWYG() {
+	//Validamos antes de guardar
+	if (!confirm('Esta totalmente seguro de que desea guardar o actualizar lod datos de esta plantilla?'))
+		return;
+
 	const formData = new FormData();
 	let htmlVerb = "POST";
-	
+
 	const id = Number(window.currentTemplateId);
 
 	if (Number.isInteger(id) && id > 0) {
-	    htmlVerb = "PATCH";
-	    formData.append("id", id);
+		htmlVerb = "PATCH";
+		formData.append("id", id);
 	}
-	
+
 	formData.append("templateName", document.getElementById("templateName").value);
 	formData.append("description", document.getElementById("description").value);
 	formData.append("sendFrequency", document.getElementById("sendFrequency").value);
 	formData.append("dateTimeSending", document.getElementById("scheduleDateTime").value);
 	formData.append("repeatEachTimeAt", document.getElementById("dailyTime").value);
-	if(document.getElementById("sendFrequency").value==="DAILY")
+	if (document.getElementById("sendFrequency").value === "DAILY")
 		formData.append("repeatLimitType", document.getElementById("repeatLimitType").value);
 	formData.append("repeatQuantity", document.getElementById("repeatCount").value);
-	formData.append("repeatEndDate", document.getElementById("endDate").value);
+	formData.append("repeatEndDate", document.getElementById("endDate").value + getTimePart(document.getElementById("dailyTime").value));
 	formData.append("emailList", document.getElementById("recipients").value);
 	formData.append("htmlInput", document.getElementById("htmlInput").value);
 
@@ -28,8 +32,8 @@ async function processWYSIWYG() {
 	for (let i = 0; i < files.length; i++) {
 		formData.append("images", files[i]);
 	}
-	
-	if(!isValidWYSIWYGFormDataBeforePersist())
+
+	if (!isValidWYSIWYGFormDataBeforePersist())
 		return;
 
 	try {
@@ -60,69 +64,69 @@ async function processWYSIWYG() {
 // =====================================================
 document.addEventListener("DOMContentLoaded", function () {
 
-  if (editMode && viewDTO) {
+	if (editMode && viewDTO) {
 
-    // =========================
-    // 1. FORM
-    // =========================
-	window.currentTemplateId = viewDTO.id ? Number(viewDTO.id) : null;
-    document.getElementById("templateName").value = viewDTO.templateName || "";
-    document.getElementById("description").value = viewDTO.description || "";
-    document.getElementById("sendFrequency").value = viewDTO.sendFrequency || "";
-    document.getElementById("scheduleDateTime").value = viewDTO.dateTimeSending || "";
-    document.getElementById("dailyTime").value = viewDTO.repeatEachTimeAt || "";
-    document.getElementById("repeatLimitType").value = viewDTO.repeatLimitType || "";
-    document.getElementById("repeatCount").value = viewDTO.repeatQuantity || "";
-    document.getElementById("endDate").value = viewDTO.repeatEndDate || "";
-    document.getElementById("recipients").value = viewDTO.emailList || "";
-	
+		// =========================
+		// 1. FORM
+		// =========================
+		window.currentTemplateId = viewDTO.id ? Number(viewDTO.id) : null;
+		document.getElementById("templateName").value = viewDTO.templateName || "";
+		document.getElementById("description").value = viewDTO.description || "";
+		document.getElementById("sendFrequency").value = viewDTO.sendFrequency || "";
+		document.getElementById("scheduleDateTime").value = viewDTO.dateTimeSending || "";
+		document.getElementById("dailyTime").value = viewDTO.repeatEachTimeAt || "";
+		document.getElementById("repeatLimitType").value = viewDTO.repeatLimitType || "";
+		document.getElementById("repeatCount").value = viewDTO.repeatQuantity || "";
+		document.getElementById("endDate").value = viewDTO.repeatEndDate || "";
+		document.getElementById("recipients").value = viewDTO.emailList || "";
 
-    // =========================
-    // 2. HTML
-    // =========================
-    document.getElementById("htmlInput").value = viewDTO.htmlInput || "";
 
-    // =========================
-    // 3. UI EVENTS
-    // =========================
-    document.getElementById("sendFrequency")
-      .dispatchEvent(new Event("change"));
+		// =========================
+		// 2. HTML
+		// =========================
+		document.getElementById("htmlInput").value = viewDTO.htmlInput || "";
 
-    document.getElementById("repeatLimitType")
-      .dispatchEvent(new Event("change"));
+		// =========================
+		// 3. UI EVENTS
+		// =========================
+		document.getElementById("sendFrequency")
+			.dispatchEvent(new Event("change"));
 
-	document.getElementById("repeatCount").value = viewDTO.repeatQuantity || "";
-	document.getElementById("endDate").value = viewDTO.repeatEndDate || "";
-    // =========================
-    // 4. IMAGE BRIDGE (CLAVE 🔥)
-    // =========================
-	window.uploadedImages = {};
-    if (viewDTO.images) {
-	  window.uploadedImages = { ...(viewDTO.images || {}) };
-    }
+		document.getElementById("repeatLimitType")
+			.dispatchEvent(new Event("change"));
 
-    // =========================
-    // 5. PREVIEW
-    // =========================
-    updatePreview();
+		document.getElementById("repeatCount").value = viewDTO.repeatQuantity || "";
+		document.getElementById("endDate").value = viewDTO.repeatEndDate || "";
+		// =========================
+		// 4. IMAGE BRIDGE (CLAVE 🔥)
+		// =========================
+		window.uploadedImages = {};
+		if (viewDTO.images) {
+			window.uploadedImages = { ...(viewDTO.images || {}) };
+		}
 
-    // =========================
-    // 6. THUMBNAILS (SIN DELAY, SIN HACKS)
-    // =========================
-    const imageList = document.getElementById("imageList");
+		// =========================
+		// 5. PREVIEW
+		// =========================
+		updatePreview();
 
-    if (viewDTO.images) {
-      imageList.innerHTML = "";
+		// =========================
+		// 6. THUMBNAILS (SIN DELAY, SIN HACKS)
+		// =========================
+		const imageList = document.getElementById("imageList");
 
-	  for (const fileName in window.uploadedImages) {
-	    const img = document.createElement("img");
-	    img.src = window.uploadedImages[fileName];
-	    img.style.width = "100px";
-	    img.title = fileName;
-	    imageList.appendChild(img);
-	  }
-    }
-  }
+		if (viewDTO.images) {
+			imageList.innerHTML = "";
+
+			for (const fileName in window.uploadedImages) {
+				const img = document.createElement("img");
+				img.src = window.uploadedImages[fileName];
+				img.style.width = "100px";
+				img.title = fileName;
+				imageList.appendChild(img);
+			}
+		}
+	}
 });
 
 
