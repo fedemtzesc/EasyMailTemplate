@@ -16,7 +16,8 @@ async function processWYSIWYG() {
 	formData.append("sendFrequency", document.getElementById("sendFrequency").value);
 	formData.append("dateTimeSending", document.getElementById("scheduleDateTime").value);
 	formData.append("repeatEachTimeAt", document.getElementById("dailyTime").value);
-	formData.append("repeatLimitType", document.getElementById("repeatLimitType").value);
+	if(document.getElementById("sendFrequency").value==="DAILY")
+		formData.append("repeatLimitType", document.getElementById("repeatLimitType").value);
 	formData.append("repeatQuantity", document.getElementById("repeatCount").value);
 	formData.append("repeatEndDate", document.getElementById("endDate").value);
 	formData.append("emailList", document.getElementById("recipients").value);

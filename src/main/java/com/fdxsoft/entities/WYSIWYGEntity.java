@@ -2,8 +2,13 @@ package com.fdxsoft.entities;
 
 import java.time.LocalDateTime;
 
+import com.fdxsoft.enums.RepeatLimitType;
+import com.fdxsoft.enums.SendFrequency;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,18 +35,20 @@ public class WYSIWYGEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 1)
-    private String sendFrequency; // S/Scheduled, D/Daily, I/Immediate
 
-    private String dateTimeSending;
+	@Enumerated(EnumType.STRING)
+	private SendFrequency sendFrequency;
+	
+    private LocalDateTime dateTimeSending;
 
-    private String repeatEachTimeAt;
+    private LocalDateTime repeatEachTimeAt;
 
-    private String repeatLimitType; // UNLIMITED, QUANTITY, END_DATE
+    @Enumerated(EnumType.STRING)
+	private RepeatLimitType repeatLimitType;
 
     private Integer repeatQuantity;
 
-    private String repeatEndDate;
+    private LocalDateTime repeatEndDate;
 
     private String emailList;
     

@@ -1,7 +1,15 @@
 package com.fdxsoft.controllers.dtos;
 
+import java.time.LocalDateTime;
+
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fdxsoft.enums.RepeatLimitType;
+import com.fdxsoft.enums.SendFrequency;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,16 +20,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WYSIWYGRequestDTO {
-    private Long id;
-    private String templateName;
-    private String description;
-    private String sendFrequency; // S/Scheduled, D/Daily, I/Immediate
-    private String dateTimeSending;
-    private String repeatEachTimeAt;
-    private String repeatLimitType; // UNLIMITED, QUANTITY, END_DATE
-    private Integer repeatQuantity;
-    private String repeatEndDate;
-    private String emailList;
-    private String htmlInput;
-    private MultipartFile[] images;
+	private Long id;
+	private String templateName;
+	private String description;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private SendFrequency sendFrequency;
+	private LocalDateTime dateTimeSending;
+	private LocalDateTime repeatEachTimeAt;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private RepeatLimitType repeatLimitType;
+	private Integer repeatQuantity;
+	private LocalDateTime repeatEndDate;
+	private String emailList;
+	private String htmlInput;
+	private MultipartFile[] images;
 }

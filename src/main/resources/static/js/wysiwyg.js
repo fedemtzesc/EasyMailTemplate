@@ -137,7 +137,7 @@ sendFrequency.addEventListener('change', () => {
 	lblRecipients.style.display = 'none';
 	endDate.style.display = 'none';
 
-	if (sendFrequency.value === 'D') {
+	if (sendFrequency.value === 'DAILY') {
 
 		dailyTime.style.display = 'inline-block';
 		recipients.style.display = 'inline-block';
@@ -151,7 +151,7 @@ sendFrequency.addEventListener('change', () => {
 			handleRepeatLimitChange();
 		}, 100);
 
-	} else if (sendFrequency.value === 'S') {
+	} else if (sendFrequency.value === 'SCHEDULED') {
 
 		scheduleDateTime.style.display = 'inline-block';
 		recipients.style.display = 'inline-block';

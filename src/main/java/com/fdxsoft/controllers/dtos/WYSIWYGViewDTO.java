@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+
+import com.fdxsoft.enums.RepeatLimitType;
+import com.fdxsoft.enums.SendFrequency;
 
 @Getter
 @Setter
@@ -19,12 +23,12 @@ public class WYSIWYGViewDTO {
     private Long id;
     private String templateName;
     private String description;
-    private String sendFrequency;
-    private String dateTimeSending;
-    private String repeatEachTimeAt;
-    private String repeatLimitType;
+    private SendFrequency sendFrequency;
+    private LocalDateTime dateTimeSending;
+    private LocalDateTime repeatEachTimeAt;
+    private RepeatLimitType repeatLimitType;
     private Integer repeatQuantity;
-    private String repeatEndDate;
+    private LocalDateTime repeatEndDate;
     private String emailList;
 
     // =========================

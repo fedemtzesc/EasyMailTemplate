@@ -363,41 +363,41 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 			dto.setTemplateName(entity.getTemplateName());
 
 			switch (entity.getSendFrequency()) {
-			case "I":
-				dto.setSendFrequencyDescription("Envío Inmediato");
+			case IMMEDIATE:
+				dto.setSendFrequencyDescription("Envío inmediato");
 				dto.setRepeatLimitDescription("Envio inmediato al ser llamado via API REST.");
 				break;
 
-			case "S":
-				dto.setSendFrequencyDescription("Envio en cierta fecha y a cierta hora");
+			case SCHEDULED:
+				dto.setSendFrequencyDescription("Envio en fecha programada");
 				dto.setRepeatLimitDescription("El envio sera realizado el dia "
-						+ DateTimeUtils.DescriptiveFormat(entity.getDateTimeSending()));
+						+ DateTimeUtils.descriptiveFormat(entity.getDateTimeSending()));
 				break;
 
-			case "D":
-				dto.setSendFrequencyDescription("Repetir cierta cantidad de días a cierta hora.");
+			case DAILY:
+				dto.setSendFrequencyDescription("Envio diario a cierta hora.");
 
 				switch (entity.getRepeatLimitType()) {
-				case "UNLIMITED":
-					dto.setRepeatLimitDescription("Sin límite de tiempo.");
+				case UNLIMITED:
+					dto.setRepeatLimitDescription("Sin límite de terminacion.");
 					break;
 
-				case "QUANTITY":
+				case QUANTITY:
 					dto.setRepeatLimitDescription(
-							entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt());
+							entity.getRepeatQuantity() + " días a las " + entity.getRepeatEachTimeAt() + ". A partir del dia" + entity.getRepeatEachTimeAt());
 					break;
 
-				case "END_DATE":
-					dto.setRepeatLimitDescription("Todos los días hasta el día " + entity.getRepeatEndDate());
+				case END_DATE:
+					dto.setRepeatLimitDescription("Del dia " + entity.getRepeatEachTimeAt() + " al día " + entity.getRepeatEndDate());
 					break;
 
 				default:
-					dto.setRepeatLimitDescription(entity.getRepeatLimitType());
+					dto.setRepeatLimitDescription("REPETICION DE ENVIO INVALIDA");
 				}
 				break;
 
 			default:
-				dto.setSendFrequencyDescription(entity.getSendFrequency());
+				dto.setSendFrequencyDescription("PROGRAMACION DE ENVIO INVALIDA");
 			}
 
 			return dto;
