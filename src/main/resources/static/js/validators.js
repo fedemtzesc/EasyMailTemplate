@@ -25,15 +25,15 @@ function isValidWYSIWYGFormDataBeforePersist() {
 
 	//Ahora validamos por cada valor del primer combobox que se refiere a la frecuencia de envio
 	switch (data.sendFrequency.value) {
-		case 'I': //Envio Inmediate
+		case 'IMMEDIATE': //Envio Inmediate
 			console.log('Envio inmediato solo requiere nombre de plantilla y descripcion');
 			//Limpio los campos que no se requieren
 			break;
-		case 'S': //Envio Scheduled
+		case 'SCHEDULED': //Envio Scheduled
 			if (!isValidISODateTime(data.dateTimeSending.value.trim()))
 				msg += '- Tiene que especificar una fecha con hora de envio validas.\n';
 			break;
-		case 'D': //Envio Daily, que se repite todos los dias a partir de la fecha de creacion, a cierta hora y por cierta cantidad de veces o por terminacion de fecha
+		case 'DAILY': //Envio Daily, que se repite todos los dias a partir de la fecha de creacion, a cierta hora y por cierta cantidad de veces o por terminacion de fecha
 			if (data.repeatEachTimeAt.value.trim() === '') {
 				msg += '- Al haber elegido envio diario tiene que especificar la hora exacta en que se haran los envios diariamente.\n';
 			} else {
@@ -57,7 +57,7 @@ function isValidWYSIWYGFormDataBeforePersist() {
 			break;
 	}
 
-	if (data.sendFrequency.value !== 'I')
+	if (data.sendFrequency.value !== 'IMMEDIATE')
 		msg += getRecipentValidationMsg(data.recipients.value);
 
 	if (msg.trim() === '')

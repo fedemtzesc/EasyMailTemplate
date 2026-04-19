@@ -51,6 +51,8 @@ ESTADO	PARA DIA  	TERMINADO EL	DESCRIPCION DE LA TAREA O PENDIENTE
  										- Cantidad maxima de intentos de envio de correo
  										- Tiempo maximo de espera por respuesta de un envio de correo (en segundos) 
  										- Tiempo de espera de consulta en BD para motor de envios programados
+ 										
+ [X]		19/04/2026					@fix: Me falto agregar el campo subject para la plantilla. Terminado a las 17:21 					
  
 
  [X] 	18/04/2026	18/04/2026T15	@FEATURE: Al momento de guardar la informacion de una plantilla generar los datos de su programacion 

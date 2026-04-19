@@ -452,7 +452,11 @@ public class WYSIWYGServiceImpl implements WYSIWYGService {
 		if (wysiwygRequestDTO.getTemplateName() != null) {
 			wysiwygEntity.setTemplateName(wysiwygRequestDTO.getTemplateName());
 		}
-
+				
+		if (wysiwygRequestDTO.getTemplateSubject() != null) {
+			wysiwygEntity.setTemplateSubject(wysiwygRequestDTO.getTemplateSubject());
+		}	
+		
 		if (wysiwygRequestDTO.getDescription() != null) {
 			wysiwygEntity.setDescription(wysiwygRequestDTO.getDescription());
 		}

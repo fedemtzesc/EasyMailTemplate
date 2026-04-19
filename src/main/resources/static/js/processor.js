@@ -16,6 +16,7 @@ async function processWYSIWYG() {
 	}
 
 	formData.append("templateName", document.getElementById("templateName").value);
+	formData.append("templateSubject", document.getElementById("templateSubject").value);	
 	formData.append("description", document.getElementById("description").value);
 	formData.append("sendFrequency", document.getElementById("sendFrequency").value);
 	formData.append("dateTimeSending", document.getElementById("scheduleDateTime").value);
@@ -23,7 +24,8 @@ async function processWYSIWYG() {
 	if (document.getElementById("sendFrequency").value === "DAILY")
 		formData.append("repeatLimitType", document.getElementById("repeatLimitType").value);
 	formData.append("repeatQuantity", document.getElementById("repeatCount").value);
-	formData.append("repeatEndDate", document.getElementById("endDate").value + getTimePart(document.getElementById("dailyTime").value));
+	if (document.getElementById("dailyTime").value.trim()!=='')
+		formData.append("repeatEndDate", document.getElementById("endDate").value + getTimePart(document.getElementById("dailyTime").value));
 	formData.append("emailList", document.getElementById("recipients").value);
 	formData.append("htmlInput", document.getElementById("htmlInput").value);
 

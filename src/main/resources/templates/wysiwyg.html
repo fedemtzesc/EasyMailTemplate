@@ -37,26 +37,29 @@
                     <input type="file" id="fileHTMLInput" accept=".html" style="display:none;">
 
                     <label>Nombre de plantilla (sin extension html):</label>
-                    <input type="text" id="templateName" placeholder="ej. promocion_navidad">
+                    <input type="text" id="templateName" placeholder="ej. PROMO_DIC24_2026" title="Seria el nombre con el cual se guardaria su plantilla de envio de correo">
+                    
+                    <label>Asunto del Correo (subject):</label>
+                    <input type="text" id="templateSubject" size="100" placeholder="ej. Pago {{num_pago}} de {{pagos}} de {{nombre_cliente}} del semestre {{semestre}}" title="Es el asunto con el que llega el correo. Puede ir como un texto sencillo, o puede ir con place-hloders, siempre y cuando la frecuencia de envio sea inmediata.">
 
                     <label id="jsonLabel">Descripción de su plantilla:</label>
                     <textarea id="description" rows="3" cols="5"
-                        placeholder="Escriba una breve descripción de la funcionalidad de plantilla"></textarea>
+                        placeholder="Escriba una breve descripción de la funcionalidad de plantilla" title="Aqui se explica cual es la funcinalidad de esta plantilla en general"></textarea>
 
                     <label>Frecuencia de Envío:</label>
-                    <select id="sendFrequency">
+                    <select id="sendFrequency" title="Determina el modo de envio de esta plantilla en el tiempo...">
                         <option value="IMMEDIATE" selected>Envio Inmediato</option>
                         <option value="SCHEDULED">Por fecha y hora de envío</option>
                         <option value="DAILY">Repetir todos los días a esta hora</option>
                     </select>
 
                     <input type="datetime-local" id="scheduleDateTime" style="margin-bottom:8px; display:none;"
-                        lang="es">
-                    <input type="datetime-local" id="dailyTime" style="margin-bottom:8px; display:none;">
+                        lang="es" title="Determina la fecha y hora de envio de la plantilla, una unica vez.">
+                    <input type="datetime-local" id="dailyTime" style="margin-bottom:8px; display:none;" title="Si el envio se repetira todos los dias a cierta hora, aqui se dedine la primera fecha de envio...">
 
                     <div id="dailyLimitContainer" class="hidden">
                         <label class="limit-label">Límite de Repetición:</label>
-                        <select id="repeatLimitType" style="margin-bottom: 5px;">
+                        <select id="repeatLimitType" style="margin-bottom: 5px;" title="Determina la manera en que se repetiran los envios de la plantilla en el tiempo...">
                             <option value="">-- Seleccione una opción --</option>
                             <option value="UNLIMITED" selected>Sin límite (Continuo)</option>
                             <option value="QUANTITY">Por cantidad de veces</option>
@@ -64,14 +67,14 @@
                         </select>
 
                         <input type="number" id="repeatCount" placeholder="Número de repeticiones (ej. 10)"
-                            style="margin-bottom:8px; display:none;">
-                        <input type="date" id="endDate" style="margin-bottom:8px; display:none;">
+                            style="margin-bottom:8px; display:none;" title="Si el Limite de Repeticion es por cantidad de veces, aqui se establece esa cantidad de veces">
+                        <input type="date" id="endDate" style="margin-bottom:8px; display:none;" title="Si el Limite de Repeticion es por fecha de termino, esta seria la fecha en que terminaran los envios...">
                     </div>
 
                     <label id="lblRecipients">Destinatarios:</label>
-                    <input type="text" id="recipients" placeholder="emails (separados por coma)">
+                    <input type="text" id="recipients" placeholder="emails (separados por coma)" title="Aqui se pueden meter direcciones de e-mail puras, o nombres de listas de correos, con un maximo de 5 elementos de cada tipo...">
 
-                    <label>Subir imágenes de la plantilla (jpeg, gif, png, jpg, etc...):</label>
+                    <label title="Si la plantilla lleva imagenes se le antepondra el siguiente path al nombre de cada imagen...&#10;ej.: <img src='img/nombre_imagen.png' style='heigth:100px'/>&#10;OJO: Se deben seleccionar todas las imagenes de un unico directorio.">Subir imágenes de la plantilla (jpeg, gif, png, jpg, etc...):</label>
                     <input type="file" id="imageUpload" title="Haga click aqui para seleccionar sus archivos..."
                         multiple accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
                     <div id="imageList"></div>

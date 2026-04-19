@@ -34,6 +34,7 @@ public class WYSIWYGEntity {
     private Long id;
 
     private String templateName;
+    private String templateSubject;
 
     @Column(columnDefinition = "TEXT")
     private String description;

@@ -22,6 +22,7 @@ import lombok.Setter;
 public class WYSIWYGRequestDTO {
 	private Long id;
 	private String templateName;
+	private String templateSubject;
 	private String description;
 	@NotNull
 	@Enumerated(EnumType.STRING)
