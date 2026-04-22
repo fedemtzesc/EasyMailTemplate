@@ -17,4 +17,9 @@ public class TestAuthController {
 	public String helloSecured() {
 		return "Hello World Secured!";
 	}
+	
+	@GetMapping("/hello-secured2")
+	public String helloSecured2() {
+		return "Hello World Secured 2!";
+	}
 }
