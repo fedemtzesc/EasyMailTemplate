@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fdxsoft.controllers.dtos.GenericResponseDTO;
@@ -18,6 +19,11 @@ public class ViewsController {
 	@Autowired
 	WYSIWYGServiceImpl wysiwygServiceImpl;
 
+    @GetMapping({"/index", "/"})
+    public String index() {
+        return "index";
+    }
+    
 	@GetMapping("/wysiwyg")
 	public String getWYSIWYG(@RequestParam(required = false) Long id, Model model) {
 		boolean editMode = false;
@@ -39,6 +45,7 @@ public class ViewsController {
     public String welcome() {
         return "welcome";
     }
+    
     
     @GetMapping("/templates-list")
     public String templatesList() {
