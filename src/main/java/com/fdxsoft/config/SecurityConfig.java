@@ -1,8 +1,5 @@
 package com.fdxsoft.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,15 +11,13 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+
+import com.fdxsoft.service.impl.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -38,10 +33,24 @@ public class SecurityConfig {
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .authorizeHttpRequests(http -> {
 	        	// End-points publicos y de libre acceso
-	        	http.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/index").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/catalog/**").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/css/**").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/emails/**").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/img/**").permitAll();
+	        	http.requestMatchers(HttpMethod.GET, "/js/**").permitAll();
 	        	
 	        	// End-points con restricciones
-	        	http.requestMatchers(HttpMethod.GET, "/auth/hello-secured").hasAuthority("CREATE");
+	        	
+	        	// TESTING
+	        	http.requestMatchers(HttpMethod.GET, "/auth/get")
+	        						.access(new WebExpressionAuthorizationManager("hasRole('USER') or (hasRole('ADMIN') and hasAuthority('CONFIG'))"));
+	        	http.requestMatchers(HttpMethod.POST, "/auth/post").hasRole("USER");
+	        	http.requestMatchers(HttpMethod.PUT, "/auth/put").hasRole("MANAGER");
+	        	http.requestMatchers(HttpMethod.PATCH, "/auth/patch").hasRole("OPERATOR");
+	        	http.requestMatchers(HttpMethod.DELETE, "/auth/delete").hasRole("GUEST");
+	        	//http.requestMatchers(HttpMethod.GET, "/auth/get").hasAuthority("CONFIG");
 	        	
 	        	// Cualquier otro, se le niega el acceso si no esta especificado
 	        	http.anyRequest().denyAll();
@@ -52,7 +61,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
-
         return config.getAuthenticationManager();
     }
 
@@ -62,42 +70,15 @@ public class SecurityConfig {
      * @return
      */
     @Bean
-    public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsServiceList());
+    public AuthenticationProvider authenticationProvider(UserDetailsServiceImpl userDetailsService,
+    		PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
     
     @Bean
-    public UserDetailsService userDetailsService() {
-    	UserDetails userDetails = User.withUsername("federico")
-    			.password("1234")
-    			.roles("ADMIN")
-    			.authorities("READ", "CREATE")
-    			.build();
-    	
-    	return new InMemoryUserDetailsManager(userDetails);
-    }
-    
-    @Bean
-    public UserDetailsService userDetailsServiceList() {
-    	List<UserDetails> userDetailsList = new ArrayList<UserDetails>();
-    	userDetailsList.add(User.withUsername("federico")
-    			.password("12345")
-    			.roles("ADMIN")
-    			.authorities("READ", "CREATE")
-    			.build());
-    	userDetailsList.add(User.withUsername("yolanda")
-    			.password("12345")
-    			.roles("USER")
-    			.authorities("READ")
-    			.build());
-    	    	
-    	return new InMemoryUserDetailsManager(userDetailsList);
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
