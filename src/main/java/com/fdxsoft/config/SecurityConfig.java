@@ -1,5 +1,6 @@
 package com.fdxsoft.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,13 +17,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.fdxsoft.config.filters.JwtTokenValidator;
 import com.fdxsoft.service.impl.UserDetailsServiceImpl;
+import com.fdxsoft.utils.JwtUtils;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+	
+	@Autowired
+	private JwtUtils jwtUtils;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -40,6 +47,7 @@ public class SecurityConfig {
 	        	http.requestMatchers(HttpMethod.GET, "/emails/**").permitAll();
 	        	http.requestMatchers(HttpMethod.GET, "/img/**").permitAll();
 	        	http.requestMatchers(HttpMethod.GET, "/js/**").permitAll();
+	        	http.requestMatchers(HttpMethod.POST, "/auth/v1/log-in").permitAll();
 	        	
 	        	// End-points con restricciones
 	        	
@@ -55,6 +63,7 @@ public class SecurityConfig {
 	        	// Cualquier otro, se le niega el acceso si no esta especificado
 	        	http.anyRequest().denyAll();
 	        })
+	        .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
 	        .build();
 	}
 

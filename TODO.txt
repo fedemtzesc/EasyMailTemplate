@@ -1,6 +1,7 @@
 ------	---------	-------------	-----------------------------------------------------------------------------------------------------
 ESTADO	PARA DIA  	TERMINADO EL	DESCRIPCION DE LA TAREA O PENDIENTE
 ------	---------	-------------	-----------------------------------------------------------------------------------------------------
+
  []		24/04/2026					@feature: Desarrollar modulo de cambio de password por el usuario mismo
  
  []		23/04/2026					@feature: Desarrollar modulo de administracion de usuarios con las siguientes 
@@ -11,7 +12,7 @@ ESTADO	PARA DIA  	TERMINADO EL	DESCRIPCION DE LA TAREA O PENDIENTE
  []		22/04/2026					@feature: Implementar modulo de configuracion del sistema. Con parametros asociados al Id del User
  									que este firmado y configurando en ese momento.
  										
- []		23/04/2026					@feature: Implementar Modulo SpringSecurity en mi aplicacion. Con seguridad de token JWT
+ [x]	23/04/2026	25/04/2026T				@feature: Implementar Modulo SpringSecurity en mi aplicacion. Con seguridad de token JWT
  
  [x]	23/04/2026	23/04/2026T19	@feature: Implementar Modulo SpringSecurity en mi aplicacion. Con autenticacion basica
   									

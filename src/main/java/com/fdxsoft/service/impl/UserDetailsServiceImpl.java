@@ -4,21 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fdxsoft.controllers.dtos.AuthLoginRequest;
+import com.fdxsoft.controllers.dtos.AuthResponse;
+import com.fdxsoft.controllers.dtos.GenericResponseDTO;
 import com.fdxsoft.entities.UserEntity;
+import com.fdxsoft.entities.WYSIWYGEntity;
 import com.fdxsoft.repositories.UserRepository;
+import com.fdxsoft.utils.JwtUtils;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	UserRepository repository;
 	
+	@Autowired
+	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -45,5 +61,53 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 				userEntity.isAccountNonLocked(),
 				authorityList);
 	}
+	
+	public GenericResponseDTO<AuthResponse> loginUser(AuthLoginRequest authLoginRequest) {
+		GenericResponseDTO<AuthResponse> response = new GenericResponseDTO<>();
+		
+		try {
+			String username = authLoginRequest.username();
+			String password = authLoginRequest.password();
+			
+			Authentication authentication = this.authenticate(username, password);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			String accessToken = jwtUtils.createToken(authentication);
+			AuthResponse authResponse=  new AuthResponse(username, accessToken);
+			
+			response.setMessage("Autenticacion exitosa.");
+			response.setStatus("success");
+			response.setHttpStatus(HttpStatus.OK.value());
+			response.setData(List.of(authResponse));
+		} catch(UsernameNotFoundException e) {
+			response.setMessage("ERROR: " + e.getMessage());
+			response.setStatus("error");
+			response.setHttpStatus(HttpStatus.UNAUTHORIZED.value());
+		} catch(BadCredentialsException e) {
+			response.setMessage("ERROR: " + e.getMessage());
+			response.setStatus("error");
+			response.setHttpStatus(HttpStatus.UNAUTHORIZED.value());		
+		} catch (Exception e) {
+			response.setMessage("ERROR: " + e.getMessage());
+			response.setStatus("error");
+			response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		}
+		
+		return response;		
+	}
+	
+	private Authentication authenticate(String username, String password) {
+		UserDetails userDetails = this.loadUserByUsername(username);
+		
+		if(userDetails == null) {
+			throw new BadCredentialsException("El usuario es invalido.");
+		}
+		
+		if(!passwordEncoder.matches(password, userDetails.getPassword())) {
+			throw new BadCredentialsException("El password es invalido.");
+		}
+		
+		return new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities());
+	}
+	
 
 }
