@@ -9,10 +9,12 @@ ESTADO	PARA DIA  	TERMINADO EL	DESCRIPCION DE LA TAREA O PENDIENTE
  										- Listado de usuarios
  										- CRUD
 
- []		22/04/2026					@feature: Implementar modulo de configuracion del sistema. Con parametros asociados al Id del User
+ []		28/04/2026					@feature: Implementar modulo de configuracion del sistema. Con parametros asociados al Id del User
  									que este firmado y configurando en ese momento.
+ 									
+ []		28/04/2026					@feature: Hacer que el user se pueda firmar dentro del sistema
  										
- [x]	23/04/2026	25/04/2026T				@feature: Implementar Modulo SpringSecurity en mi aplicacion. Con seguridad de token JWT
+ [x]	23/04/2026	28/04/2026T15	@feature: Implementar Modulo SpringSecurity en mi aplicacion. Con seguridad de token JWT
  
  [x]	23/04/2026	23/04/2026T19	@feature: Implementar Modulo SpringSecurity en mi aplicacion. Con autenticacion basica
   									

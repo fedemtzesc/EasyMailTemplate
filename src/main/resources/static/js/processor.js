@@ -148,3 +148,52 @@ function clearForm() {
 	// archivos también
 	document.getElementById("imageUpload").value = '';
 }
+
+
+async function loginUser(event) {
+
+    event.preventDefault();
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const password =
+        document.getElementById("password").value.trim();
+
+    if (username === "" || password === "") {
+        alert("Debe capturar usuario y password.");
+        return;
+    }
+
+    const reqData = {
+        username: username,
+        password: password
+    };
+
+    const response = await doFetch(
+        "POST",
+        "/auth/v1/log-in",
+        reqData
+    );
+
+    if (response === null) {
+        alert("No fue posible conectar con el servidor.");
+        return;
+    }
+
+    if (response.status === "success") {
+
+        // Ya no guardar JWT en localStorage.
+        // El backend lo guardará en cookie HttpOnly.
+
+        window.location.href = "/welcome";
+
+    } else {
+        alert(response.message);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");
+    form.addEventListener("submit", loginUser);
+});

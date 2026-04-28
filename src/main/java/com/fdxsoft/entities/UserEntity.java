@@ -1,5 +1,6 @@
 package com.fdxsoft.entities;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,6 +43,18 @@ public class UserEntity {
 	private boolean accountNonExpired;
 	private boolean accountNonLocked;
 	private boolean credentialsNonExpired;
+	
+	//Columnas de informacion general
+	@Column(length=100, nullable=false)
+	private String name;
+	@Column(length=100)
+	private String lastName;
+	@Column(length=13, nullable=false, unique=true)
+	private String phone;
+	@Column(length=100, nullable=false, unique=true)
+	private String email;
+	@Column(name = "created_at", insertable = false, updatable = false)
+	private LocalDateTime createdAt;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(	name = "user_role", 
@@ -49,9 +62,13 @@ public class UserEntity {
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<RoleEntity> roles = new HashSet<RoleEntity>();
 	
-	/* DSCOMENTARIAR CUANDO YA TENGA TODA LA SEGURIDAD ARMADA
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "fk_user_id")
 	private Set<WYSIWYGEntity> templates = new HashSet<WYSIWYGEntity>();
-	*/
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "fk_user_id")
+	private Set<UserLoginIpEntity> loginIps = new HashSet<UserLoginIpEntity>();
+	
 }

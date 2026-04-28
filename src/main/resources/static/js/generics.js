@@ -1,9 +1,12 @@
+// generics.js
+
 async function doFetch(reqMethod, url, reqData) {
   const fetchOptions = {
     method: reqMethod,
+    credentials: "include", // permite enviar/recibir cookies
     headers: {
-      'Accept': "application/json",
-      'Content-Type': "application/json",
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
     }
   };
 
@@ -14,12 +17,11 @@ async function doFetch(reqMethod, url, reqData) {
 
   try {
     const response = await fetch(url, fetchOptions);
-	console.log(response);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+
+    console.log(response);
 
     const data = await response.json();
+
     return data;
 
   } catch (error) {

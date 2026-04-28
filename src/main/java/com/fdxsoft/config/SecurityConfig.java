@@ -36,7 +36,7 @@ public class SecurityConfig {
 
 	    return httpSecurity
 	        .csrf(csrf -> csrf.disable())
-	        .httpBasic(Customizer.withDefaults())
+	        .httpBasic(httpBasic -> httpBasic.disable())
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .authorizeHttpRequests(http -> {
 	        	// End-points publicos y de libre acceso
@@ -47,7 +47,7 @@ public class SecurityConfig {
 	        	http.requestMatchers(HttpMethod.GET, "/emails/**").permitAll();
 	        	http.requestMatchers(HttpMethod.GET, "/img/**").permitAll();
 	        	http.requestMatchers(HttpMethod.GET, "/js/**").permitAll();
-	        	http.requestMatchers(HttpMethod.POST, "/auth/v1/log-in").permitAll();
+	        	http.requestMatchers(HttpMethod.POST, "/auth/v1/**").permitAll();
 	        	
 	        	// End-points con restricciones
 	        	
@@ -61,7 +61,7 @@ public class SecurityConfig {
 	        	//http.requestMatchers(HttpMethod.GET, "/auth/get").hasAuthority("CONFIG");
 	        	
 	        	// Cualquier otro, se le niega el acceso si no esta especificado
-	        	http.anyRequest().denyAll();
+	        	http.anyRequest().authenticated();
 	        })
 	        .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
 	        .build();

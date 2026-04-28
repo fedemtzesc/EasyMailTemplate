@@ -36,7 +36,7 @@ public class RoleEntity {
 	private Long id;
 	
 	@Enumerated(EnumType.STRING)
-	private RoleEnum ROLE;
+	private RoleEnum role;
 	
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(	name = "role_permission", 

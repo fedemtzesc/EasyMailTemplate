@@ -29,6 +29,7 @@ public class GenericResponseDTO<T> {
     private Long totalRecords;
 
     // Con este metodo regresamos la respuesta en un JSON Ordenado
+    
     public Map<String, Object> getOrderedResponse() {
     	Map<String, Object> response = new LinkedHashMap<>();
         response.put("timestamp", LocalDateTime.now());
@@ -40,6 +41,7 @@ public class GenericResponseDTO<T> {
             response.put("totalRecords", totalRecords);
             response.put("currentPage", currentPage);
         }
+        
         response.put("data", data);
         return response;
     }
